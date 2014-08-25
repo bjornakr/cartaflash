@@ -1,0 +1,51 @@
+<!--<ul ng-repeat="card in cards">-->
+<!--<li>{{ card.front }}</li>-->
+<!--<li>{{ card.back }}</li>-->
+<!--</ul>-->
+
+<div>
+
+    <div class="card box" ng-click="revealAnswer()">
+        <p>{{ currentCard.front }}</p>
+        <hr>
+        <div ng-switch="answerIsRevealed()">
+            <p ng-switch-when="true">{{ currentCard.back }}</p>
+
+            <p ng-switch-default><span class="glyphicon glyphicon-chevron-down chevron"></span></p>
+        </div>
+    </div>
+
+    <div class="text-center buttons vspace10">
+        <div ng-if="answerIsRevealed()">
+            <span class="glyphicon glyphicon-chevron-left chevron"></span>
+
+            <button class="btn btn-warning btn-lg" ng-click="nextCard()">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+            <button class="btn btn-success btn-lg" ng-click="nextCard()">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+
+            <span class="glyphicon glyphicon-chevron-right chevron"></span>
+        </div>
+        <div ng-if="!answerIsRevealed()">
+            <button class="btn btn-default btn-lg" disabled>
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+            <button class="btn btn-default btn-lg" disabled>
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="progress vspace30">
+        <div class="progress-bar" role="progressbar"
+             aria-valuenow="{{ currentProgress() }}" aria-valuemin="0" aria-valuemax="100"
+             style="width: {{ currentProgress() }}%;">
+            <!--<span class="sr-only">60% Complete</span>-->
+        </div>
+    </div>
+
+    <p>Test: {{ testOutput }}</p>
+</div>
