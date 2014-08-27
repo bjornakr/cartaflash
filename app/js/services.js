@@ -38,6 +38,37 @@ services.factory('KeyPressService', [
         }]
 );
 
+services.factory('CardService', ['$http',
+        function ($http) {
+            var cards = [];
+            var totalNumberOfCards = 0;
+
+            return {
+                loadCards: function () {
+                    $http.get('cards.json').success(function (data) {
+                        cards = data;
+                        totalNumberOfCards = data.length;
+                    });
+                },
+                getAll: function () {
+                    return cards;
+                },
+                add: function(card) {
+                    cards.unshift(angular.copy(card));
+                },
+                delete: function (card) {
+                    var cardIndex = cards.indexOf(card);
+                    if (cardIndex !== -1) {
+                        cards.splice(cardIndex, 1);
+                    }
+                },
+                getIdOf: function(card) {
+                    return card.front + card.back;
+                }
+            }
+        }]
+);
+
 
 //phonecatServices.factory('Phone', ['$resource',
 //    function ($resource) {

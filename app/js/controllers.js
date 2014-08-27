@@ -12,12 +12,9 @@ var controllers = angular.module('cartaflash.controllers', []);
 
 controllers.controller('KeyEventController', ['$scope', 'KeyPressService',
     function ($scope, $keyPressService) {
-        $scope.ruru = "Biff!";
-
         $scope.keypressed = function (event) {
             $keyPressService.setKeypress(event.keyCode);
             $scope.$broadcast("key-pressed");
-
         }
 
         $scope.getKeyCode = function () {
@@ -69,14 +66,14 @@ controllers.controller('CardController', ['$scope', '$http', '$timeout', 'KeyPre
         });
 
         $scope.$on("key-pressed", function () {
+                console.log("KEYPRESS!");
                 if ($keyPressService.hasKeyRevealAnswer()) {
                     $scope.revealAnswer();
                     $scope.testOutput = "Reveal answer.";
                 }
                 else if (($keyPressService.hasKeyFail()
                     || $keyPressService.hasKeySuccess())
-                    && answerIsRevealed)
-                {
+                    && answerIsRevealed) {
                     $scope.nextCard();
                     $scope.testOutput = "Next card.";
                 }
@@ -112,6 +109,49 @@ controllers.controller('CardController', ['$scope', '$http', '$timeout', 'KeyPre
 
         $scope.answerIsRevealed = function () {
             return answerIsRevealed;
+        }
+    }
+]);
+
+
+controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
+    function ($scope, $http, $cardService) {
+        $cardService.loadCards();
+        var lastAddedCard = null;
+        var lastDeletedCard = null;
+
+        $scope.getAllCards = function () {
+            return $cardService.getAll();
+        }
+
+        $scope.addCard = function (card) {
+            $cardService.add(card);
+            lastAddedCard = angular.copy(card);
+            $scope.card = null;
+        }
+
+        $scope.deleteCard = function (card) {
+            lastAddedCard = null;
+            lastDeletedCard = card;
+            $cardService.delete(card);
+        }
+
+        $scope.isRecentlyAdded = function(card) {
+            return lastAddedCard !== null
+                && $cardService.getIdOf(card) === $cardService.getIdOf(lastAddedCard);
+        }
+
+        $scope.hasDeletedCard = function () {
+            return lastDeletedCard !== null;
+        }
+
+        $scope.getLastDeletedCard = function () {
+            return lastDeletedCard;
+        }
+
+        $scope.undoDelete = function () {
+            $scope.addCard(lastDeletedCard);
+            lastDeletedCard = null;
         }
     }
 ]);

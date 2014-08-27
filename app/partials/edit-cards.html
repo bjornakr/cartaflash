@@ -1,0 +1,59 @@
+<!--<h3>Edit flash cards</h3>-->
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Add new</h3>
+    </div>
+    <div class="panel-body">
+        <div class="input-group">
+            <span class="input-group-addon">EN</span>
+            <input type="text" class="form-control" ng-model="card.front">
+        </div>
+
+        <br>
+
+        <div class="input-group">
+            <span class="input-group-addon">ES</span>
+            <input type="text" class="form-control" ng-model="card.back">
+        </div>
+
+        <br>
+
+        <div class="pull-right">
+            <button class="btn btn-primary" ng-click="addCard(card)">
+                <span class="glyphicon glyphicon-save"></span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!--<div class="vspace30"></div>-->
+<div ng-if="hasDeletedCard()" class="alert alert-warning" style="overflow:hidden" role="alert">
+    <p class="pull-left">
+        <strong>Deleted:</strong> {{ getLastDeletedCard().front }} | {{ getLastDeletedCard().back }}
+    </p>
+    <button ng-click="undoDelete()" class="btn btn-default btn-sm pull-right">Undo</button>
+</div>
+
+<table class="table table-striped table-bordered table-condensed table-hover fixed-table">
+    <thead>
+    <th>EN</th>
+    <th>ES</th>
+    </thead>
+    <tbody>
+    <tr ng-repeat="card in getAllCards()"
+        ng-class="{ success: isRecentlyAdded(card) }"
+        class="table-with-button">
+        <td>{{ card.front }}</td>
+        <td>{{ card.back }}
+                <button ng-click="deleteCard(card)"
+                        class="btn btn-sm btn-danger pull-right"
+                        style="display:none" show-on-hover>
+                    <span class="glyphicon glyphicon-trash pull-right"></span>
+                </button>
+        </td>
+    </tr>
+    </tbody>
+</table>

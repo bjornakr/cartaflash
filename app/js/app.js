@@ -10,7 +10,8 @@ angular.module('cartaflash', [
     'cartaflash.controllers'
 ]).
     config(['$routeProvider', function ($routeProvider) {
-        $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
+        $routeProvider.when('/edit-cards',
+            {templateUrl: 'partials/edit-cards.html', controller: 'CardCrudController'});
         $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
         $routeProvider.when('/', {templateUrl: 'partials/card.html', controller: 'CardController'});
         $routeProvider.when('/todo', {templateUrl: 'partials/todo.html'});
