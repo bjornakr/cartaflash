@@ -19,7 +19,6 @@ services.factory('KeyPressService', [
                     return this.keyCode;
                 },
                 setKeypress: function (keyCode) {
-                    console.log("Setting...");
                     this.keyCode = keyCode;
                 },
                 hasKeySuccess: function () {
@@ -40,40 +39,97 @@ services.factory('KeyPressService', [
 
 services.factory('CardService', ['$http',
         function ($http) {
+            var idCounter = 1;
             var cards = [];
-            var totalNumberOfCards = 0;
+//            var totalNumberOfCards = 0;
 
             return {
-                loadCards: function () {
-                    $http.get('cards.json').success(function (data) {
-                        cards = data;
-                        totalNumberOfCards = data.length;
-                    });
-                },
+//                loadCards: function () {
+//                    $http.get('cards.json').success(function (data) {
+//                        cards = [];
+//                        for (var i = 0; i < data.length; i++) {
+//                            cards.push(data[i]);
+//                            cards[i].id = idCounter;
+//                            idCounter++;
+//                        }
+//                        totalNumberOfCards = cards.length;
+//                        console.log("Final: " + JSON.stringify(cards));
+//                        localStorage["cards"] = JSON.stringify(cards);
+//                    });
+//                },
+
+//                loadCards: function () {
+//
+//                    var cardsFromStorage = JSON.parse(localStorage["cards"]);
+//                    cards = [];
+//                    for (var i = 0; i < cardsFromStorage.length; i++) {
+//                        console.log(cardsFromStorage[i]);
+//                        cards.push(cardsFromStorage[i]);
+//                        cards[i].id = idCounter;
+//                        idCounter++;
+//                    }
+//                    totalNumberOfCards = cards.length;
+//                    console.log(localStorage["cards"]);
+//                },
+
                 getAll: function () {
                     return cards;
                 },
-                add: function(card) {
+
+                add: function (card) {
+                    card.id = idCounter;
+                    idCounter++;
                     cards.unshift(angular.copy(card));
+
+                    localStorage["cards"] = JSON.stringify(cards);
+                    console.log(localStorage["cards"]);
                 },
+
+                // TODO: Rename
                 delete: function (card) {
+                    console.log("Delete: " + card);
                     var cardIndex = cards.indexOf(card);
                     if (cardIndex !== -1) {
                         cards.splice(cardIndex, 1);
                     }
+                    localStorage["cards"] = JSON.stringify(cards);
                 },
-                getIdOf: function(card) {
-                    return card.front + card.back;
+
+                update: function (card) {
+                    console.log("Update: " + card)
+                    var cardToBeUpdated = null;
+                    for (var i = 0; i < cards.length; i++) {
+                        if (card.id === cards[i].id) {
+                            cardToBeUpdated = cards[i];
+                        }
+                    }
+                    this.delete(cardToBeUpdated);
+                    this.add(card);
+                },
+
+                getIdOf: function (card) {
+                    return card.id;
                 }
             }
         }]
 );
 
 
-//phonecatServices.factory('Phone', ['$resource',
-//    function ($resource) {
-//        return $resource('phones/:phoneId.json', {}, {
-//            query: {method: 'GET', params: {phoneId: 'phones'}, isArray: true}
-//        });
-//    }]
-//);
+services.factory("CardRepository", [function () {
+        return {
+            loadCards: function () {
+                var cardsFromStorage = JSON.parse(localStorage["cards"]);
+                var cards = [];
+                var idCounter = 0;
+                for (var i = 0; i < cardsFromStorage.length; i++) {
+                    console.log(cardsFromStorage[i]);
+                    cards.push(cardsFromStorage[i]);
+                    cards[i].id = idCounter;
+                    idCounter++;
+                }
+                console.log(localStorage["cards"]);
+            }
+        }
+    }]
+);
+

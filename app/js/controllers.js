@@ -110,6 +110,8 @@ controllers.controller('CardController', ['$scope', '$http', '$timeout', 'KeyPre
         $scope.answerIsRevealed = function () {
             return answerIsRevealed;
         }
+
+
     }
 ]);
 
@@ -117,8 +119,10 @@ controllers.controller('CardController', ['$scope', '$http', '$timeout', 'KeyPre
 controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
     function ($scope, $http, $cardService) {
         $cardService.loadCards();
-        var lastAddedCard = null;
+        var lastUpdatedCard = null;
         var lastDeletedCard = null;
+        var cardForEdit = null;
+        var cardBeforeEdit = null;
 
         $scope.getAllCards = function () {
             return $cardService.getAll();
@@ -126,19 +130,28 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
 
         $scope.addCard = function (card) {
             $cardService.add(card);
-            lastAddedCard = angular.copy(card);
+            lastUpdatedCard = angular.copy(card);
             $scope.card = null;
         }
 
         $scope.deleteCard = function (card) {
-            lastAddedCard = null;
+            lastUpdatedCard = null;
             lastDeletedCard = card;
+            if ($scope.isEditing(card)) {
+                $scope.cancelEdit();
+            }
             $cardService.delete(card);
         }
 
+        $scope.updateCard = function (card) {
+            $cardService.update(card);
+            $scope.cancelEdit();
+            lastUpdatedCard = card;
+        }
+
         $scope.isRecentlyAdded = function(card) {
-            return lastAddedCard !== null
-                && $cardService.getIdOf(card) === $cardService.getIdOf(lastAddedCard);
+            return lastUpdatedCard !== null
+                && $cardService.getIdOf(card) === $cardService.getIdOf(lastUpdatedCard);
         }
 
         $scope.hasDeletedCard = function () {
@@ -150,8 +163,33 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         }
 
         $scope.undoDelete = function () {
-            $scope.addCard(lastDeletedCard);
+//            $scope.addCard(lastDeletedCard);
+            $cardService.add(lastDeletedCard);
+            lastUpdatedCard = angular.copy(lastDeletedCard);
             lastDeletedCard = null;
+
         }
+
+        $scope.editCard = function (card) {
+            cardForEdit = card;
+            $scope.card = angular.copy(card);
+            console.log("ZAP!");
+        }
+
+        $scope.isEditing = function (card) {
+            return cardForEdit !== null && card !== null
+                && $cardService.getIdOf(card) === $cardService.getIdOf(cardForEdit);
+        }
+
+        $scope.isInEditMode = function () {
+            return cardForEdit !== null;
+        }
+
+        $scope.cancelEdit = function () {
+            $scope.card = cardBeforeEdit;
+            cardBeforeEdit = null;
+            cardForEdit = null;
+        }
+
     }
 ]);
