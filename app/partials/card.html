@@ -3,13 +3,13 @@
 <!--<li>{{ card.back }}</li>-->
 <!--</ul>-->
 
-<div>
+<div ng-if="isSessionStarted()">
 
     <div class="card blue-box" ng-click="revealAnswer()">
-        <p>{{ currentCard.front }}</p>
+        <p>{{ getCurrentCard().front }}</p>
         <hr>
         <div ng-switch="answerIsRevealed()">
-            <p ng-switch-when="true">{{ currentCard.back }}</p>
+            <p ng-switch-when="true">{{ getCurrentCard().back }}</p>
 
             <p ng-switch-default><span class="glyphicon glyphicon-chevron-down chevron"></span></p>
         </div>
@@ -47,5 +47,12 @@
         </div>
     </div>
 
-    <p>Test: {{ testOutput }}</p>
 </div>
+
+<div ng-if="!isSessionStarted()">
+    <button ng-click="startSession()" class="btn btn-link btn-lg center-block">
+        <span class="glyphicon glyphicon-play-circle"></span>
+    </button>
+</div>
+
+<p>Test: {{ isSessionStarted() }}</p>

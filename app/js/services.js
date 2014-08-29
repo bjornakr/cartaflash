@@ -37,10 +37,9 @@ services.factory('KeyPressService', [
         }]
 );
 
-services.factory('CardService', ['$http',
-        function ($http) {
-            var idCounter = 1;
-            var cards = [];
+services.factory('CardService', ['CardRepository',
+        function (cardRepository) {
+            var cards = cardRepository.loadCards();
 //            var totalNumberOfCards = 0;
 
             return {
@@ -73,12 +72,14 @@ services.factory('CardService', ['$http',
 //                },
 
                 getAll: function () {
+//                    console.log("!!!!!!!!");
+//                    console.log(cardRepository.loadCards());
+//                    return cardRepository.loadCards();
                     return cards;
                 },
 
                 add: function (card) {
-                    card.id = idCounter;
-                    idCounter++;
+                    card.id = cardRepository.getNextId();
                     cards.unshift(angular.copy(card));
 
                     localStorage["cards"] = JSON.stringify(cards);
@@ -106,30 +107,45 @@ services.factory('CardService', ['$http',
                     this.delete(cardToBeUpdated);
                     this.add(card);
                 },
-
-                getIdOf: function (card) {
-                    return card.id;
-                }
             }
         }]
 );
 
 
-services.factory("CardRepository", [function () {
+services.factory('PracticeSessionService', ['CardRepository',
+    function (cardRepository) {
         return {
-            loadCards: function () {
-                var cardsFromStorage = JSON.parse(localStorage["cards"]);
-                var cards = [];
-                var idCounter = 0;
-                for (var i = 0; i < cardsFromStorage.length; i++) {
-                    console.log(cardsFromStorage[i]);
-                    cards.push(cardsFromStorage[i]);
-                    cards[i].id = idCounter;
-                    idCounter++;
-                }
-                console.log(localStorage["cards"]);
+            getCardsForNewSession: function() {
+                return cardRepository.loadCards();
             }
         }
-    }]
+    }
+]);
+
+services.factory("CardRepository", [
+        function () {
+            var idCounter = 0;
+
+            return {
+                loadCards: function () {
+                    var cardsFromStorage = JSON.parse(localStorage["cards"]);
+                    var cards = [];
+                    for (var i = 0; i < cardsFromStorage.length; i++) {
+//                    console.log(cardsFromStorage[i]);
+                        cards.push(cardsFromStorage[i]);
+                        cards[i].id = idCounter;
+                        idCounter++;
+                    }
+                    return cards;
+//                console.log(localStorage["cards"]);
+                },
+
+                getNextId: function () {
+                    var nextId = idCounter;
+                    idCounter++;
+                    return nextId;
+                }
+            }
+        }]
 );
 
