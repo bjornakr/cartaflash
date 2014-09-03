@@ -3,7 +3,7 @@
 <!--<li>{{ card.back }}</li>-->
 <!--</ul>-->
 
-<div ng-if="isSessionStarted()">
+<div ng-if="isSessionStarted() && !isSessionFinished()">
 
     <div class="card blue-box" ng-click="revealAnswer()">
         <p>{{ getCurrentCard().front }}</p>
@@ -22,7 +22,7 @@
             <button class="btn btn-warning btn-lg" ng-click="nextCard()">
                 <span class="glyphicon glyphicon-remove"></span>
             </button>
-            <button class="btn btn-success btn-lg" ng-click="nextCard()">
+            <button class="btn btn-success btn-lg" ng-click="win()">
                 <span class="glyphicon glyphicon-ok"></span>
             </button>
 
@@ -51,8 +51,25 @@
 
 <div ng-if="!isSessionStarted()">
     <button ng-click="startSession()" class="btn btn-link btn-lg center-block">
-        <span class="glyphicon glyphicon-play-circle"></span>
+        <h1><span class="glyphicon glyphicon-play-circle"></span></h1>
     </button>
 </div>
 
-<p>Test: {{ isSessionStarted() }}</p>
+<div ng-if="isSessionFinished()">
+    <h1>Done!</h1>
+    <table class="table table-condensed">
+        <tr ng-repeat="card in getOriginalDeck()">
+            <td>{{ card.front }}</td>
+            <td>{{ card.back }}</td>
+        </tr>
+    </table>
+
+    <div class="progress vspace30">
+        <div class="progress-bar" role="progressbar"
+             aria-valuenow="{{ currentProgress() }}" aria-valuemin="0" aria-valuemax="100"
+             style="width: {{ currentProgress() }}%;">
+            <!--<span class="sr-only">60% Complete</span>-->
+        </div>
+    </div>
+</div>
+

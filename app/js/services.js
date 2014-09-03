@@ -106,7 +106,7 @@ services.factory('CardService', ['CardRepository',
                     }
                     this.delete(cardToBeUpdated);
                     this.add(card);
-                },
+                }
             }
         }]
 );

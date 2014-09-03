@@ -35,50 +35,30 @@ controllers.controller('NavBarController', ['$scope', '$location',
 controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepository',
     function ($scope, keyPressService, cardRepository) {
         var currentCardIndex = 0;
-//        var totalNumberOfCards = 0;
         var answerIsRevealed = false;
         var isSessionStarted = false;
+        var isSessionFinished = false;
         var currentCard = null;
         var cards = [];
+        var originalDeckSize = 0;
+        var originalDeck = null;
         $scope.testOutput = "init";
 
-//        (function processKeyEvents() {
-//            if ($keyPressService.hasKeyRevealAnswer()) {
-//                $timeout(function () {
-//                    $scope.revealAnswer();
-//                    $scope.testOutput = "Reveal answer.";
-//                }, 0);
-//            }
-//            else if ($keyPressService.hasKeyFail()
-//                || $keyPressService.hasKeySuccess()) {
-//                $timeout(function () {
-//                    $scope.nextCard();
-//                    $scope.testOutput = "Next card.";
-//                }, 0);
-//            }
-//            $keyPressService.clearInput();
-//            setTimeout(processKeyEvents, 100);
-//        })();
-
-
-//        $http.get('cards.json').success(function (data) {
-//            $scope.cards = data;
-//            totalNumberOfCards = data.length;
-//        });
-
-//        cards = cardRepository.loadCards();
-//        totalNumberOfCards = $scope.cards.length;
 
         $scope.$on("key-pressed", function () {
-                if (keyPressService.hasKeyRevealAnswer()) {
-                    $scope.revealAnswer();
-                    $scope.testOutput = "Reveal answer.";
-                }
-                else if ((keyPressService.hasKeyFail()
-                    || keyPressService.hasKeySuccess())
-                    && answerIsRevealed) {
-                    $scope.nextCard();
-                    $scope.testOutput = "Next card.";
+                if (isSessionStarted && !isSessionFinished) {
+                    if (keyPressService.hasKeyRevealAnswer()) {
+                        $scope.revealAnswer();
+                        $scope.testOutput = "Reveal answer.";
+                    }
+                    else if (answerIsRevealed) {
+                        if (keyPressService.hasKeyFail()) {
+                            $scope.nextCard();
+                        }
+                        else if (keyPressService.hasKeySuccess()) {
+                            $scope.win();
+                        }
+                    }
                 }
             }
         );
@@ -88,16 +68,29 @@ controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepo
         };
 
         $scope.nextCard = function () {
-            answerIsRevealed = false;
-            currentCardIndex++;
-            if (currentCardIndex >= $scope.getTotalNumberOfCards()) {
-                currentCardIndex = 0;
+            if ($scope.getTotalNumberOfCards() === 0) {
+                isSessionFinished = true;
             }
-            console.log(currentCardIndex);
-            currentCard.front = cards[currentCardIndex].front;
-            currentCard.back = '';
-            console.log("New card: " + currentCard.front + ' / ' + currentCard.back);
+            else {
+                answerIsRevealed = false;
+                currentCardIndex++;
+                if (currentCardIndex >= $scope.getTotalNumberOfCards()) {
+                    currentCardIndex = 0;
+                }
+                currentCard.front = cards[currentCardIndex].front;
+                currentCard.back = '';
+                console.log("New card: " + currentCard.front + ' / ' + currentCard.back);
+                console.log(originalDeck.length);
+            }
         };
+
+        $scope.win = function () {
+            console.log("WIN!");
+            cards.splice(currentCardIndex, 1);
+            currentCardIndex -= 1;
+            $scope.nextCard();
+        }
+
 
         $scope.getTotalNumberOfCards = function () {
             return cards.length;
@@ -115,7 +108,7 @@ controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepo
         };
 
         $scope.currentProgress = function () {
-            return (currentCardIndex / $scope.getTotalNumberOfCards()) * 100;
+            return (1 - ($scope.getTotalNumberOfCards()) / originalDeckSize) * 100;
         };
 
         $scope.answerIsRevealed = function () {
@@ -126,13 +119,22 @@ controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepo
             return isSessionStarted;
         };
 
+        $scope.isSessionFinished = function () {
+            return isSessionFinished;
+        };
+
         $scope.startSession = function () {
             cards = cardRepository.loadCards();
             currentCard = cards[0];
+            originalDeckSize = cards.length;
             isSessionStarted = true;
-
+            originalDeck = angular.copy(cards);
 //            $scope.currentCard = $scope.cards[currentCardIndex];
         };
+
+        $scope.getOriginalDeck = function () {
+            return originalDeck;
+        }
 
     }
 ]);

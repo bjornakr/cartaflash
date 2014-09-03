@@ -22,7 +22,7 @@
     <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
 </head>
 <body ng-controller="KeyEventController" ng-keyup="keypressed($event)">
-<p>Keypress: {{ getKeyCode() }}</p>
+<!--<p>Keypress: {{ getKeyCode() }}</p>-->
 <ul class="nav nav-tabs nav-justified" role="tablist" ng-controller="NavBarController">
     <li ng-class="{ active: isActive('/')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a></li>
     <li ng-class="{ active: isActive('/edit-cards')}"><a href="#/edit-cards"><span class="glyphicon glyphicon-edit"></span></a></li>
