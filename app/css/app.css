@@ -98,7 +98,7 @@ body {
 }
 
 .buttons {
-    height: 50px;
+    height: 55px;
 }
 
 /*.constant-width {*/
@@ -131,4 +131,8 @@ div.alert-warning p.pull-left {
 
 .table-with-button {
     height: 35px;
+}
+
+.button-container {
+    height: 50px;
 }

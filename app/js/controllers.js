@@ -20,7 +20,6 @@ controllers.controller('KeyEventController', ['$scope', 'KeyPressService',
         $scope.getKeyCode = function () {
             return $keyPressService.getKeypress();
         }
-
     }
 ]);
 
@@ -32,8 +31,9 @@ controllers.controller('NavBarController', ['$scope', '$location',
     }
 ]);
 
-controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepository',
-    function ($scope, keyPressService, cardRepository) {
+controllers.controller('CardController',
+    ['$scope', 'KeyPressService', 'CardRepository', 'PracticeSessionService',
+    function ($scope, keyPressService, cardRepository, practiceSessionService) {
         var currentCardIndex = 0;
         var answerIsRevealed = false;
         var isSessionStarted = false;
@@ -86,15 +86,21 @@ controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepo
 
         $scope.win = function () {
             console.log("WIN!");
+            practiceSessionService.win(cards[currentCardIndex]);
             cards.splice(currentCardIndex, 1);
             currentCardIndex -= 1;
             $scope.nextCard();
-        }
+        };
 
+        // TODO: Change name
+        $scope.lose = function () {
+            practiceSessionService.lose(cards[currentCardIndex]);
+            $scope.nextCard();
+        };
 
         $scope.getTotalNumberOfCards = function () {
             return cards.length;
-        }
+        };
 
         $scope.revealAnswer = function () {
             answerIsRevealed = true;
@@ -124,7 +130,8 @@ controllers.controller('CardController', ['$scope', 'KeyPressService', 'CardRepo
         };
 
         $scope.startSession = function () {
-            cards = cardRepository.loadCards();
+            var allCards = cardRepository.loadCards();
+            cards = practiceSessionService.createPracticeCardDeck(allCards);
             currentCard = cards[0];
             originalDeckSize = cards.length;
             isSessionStarted = true;
@@ -183,6 +190,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         };
 
         $scope.getLastDeletedCard = function () {
+
             return lastDeletedCard;
         };
 

@@ -19,21 +19,21 @@
         <div ng-if="answerIsRevealed()">
             <span class="glyphicon glyphicon-chevron-left chevron"></span>
 
-            <button class="btn btn-warning btn-lg" ng-click="nextCard()">
-                <span class="glyphicon glyphicon-remove"></span>
+            <button class="btn btn-warning btn-lg" ng-click="lose()">
+                <span class="glyphicon glyphicon-thumbs-down"></span>
             </button>
             <button class="btn btn-success btn-lg" ng-click="win()">
-                <span class="glyphicon glyphicon-ok"></span>
+                <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
 
             <span class="glyphicon glyphicon-chevron-right chevron"></span>
         </div>
         <div ng-if="!answerIsRevealed()">
             <button class="btn btn-default btn-lg" disabled>
-                <span class="glyphicon glyphicon-remove"></span>
+                <span class="glyphicon glyphicon-thumbs-down"></span>
             </button>
             <button class="btn btn-default btn-lg" disabled>
-                <span class="glyphicon glyphicon-ok"></span>
+                <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
         </div>
 

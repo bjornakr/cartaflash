@@ -1,31 +1,115 @@
 [
     {
         "front": "Test 2",
-        "back": "Prueba 2"
+        "back": "Prueba 2",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "I want to be free",
-        "back": "A Huacho me fui"
+        "back": "A Huacho me fui",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "To give, grant",
-        "back": "Conceder"
+        "back": "Conceder",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "Intoxicated, drunk",
-        "back": "Ebrio"
+        "back": "Ebrio",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "Shoot-out",
-        "back": "Balacera"
+        "back": "Balacera",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "Complain",
-        "back": "Quejarse"
+        "back": "Quejarse",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     },
     {
         "front": "Stomach",
-        "back": "Barriga"
+        "back": "Barriga",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Miserable",
+        "back": "Destrozado",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 2",
+        "back": "Pendiente 2",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 3",
+        "back": "Pendiente 3",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 4",
+        "back": "Pendiente 4",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 5",
+        "back": "Pendiente 5",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 6",
+        "back": "Pendiente 6",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 7",
+        "back": "Pendiente 7",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 8",
+        "back": "Pendiente 8",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
+    },
+    {
+        "front": "Pending 9",
+        "back": "Pendiente 9",
+        "timesAnswered": 0,
+        "correctAnswerCount": 0,
+        "winStreak": 0
     }
-
 ]
+
