@@ -42,6 +42,10 @@ services.factory('CardService', ['CardRepository',
             var cards = cardRepository.getAll();
 //            var totalNumberOfCards = 0;
 
+            function generateId(card) {
+                return card.front.toUpperCase() + "|" + card.back.toUpperCase();
+            }
+
             return {
 //                loadCards: function () {
 //                    $http.get('cards.json').success(function (data) {
@@ -80,7 +84,7 @@ services.factory('CardService', ['CardRepository',
                 },
 
                 add: function (card) {
-                    card.id = card.front + card.back;
+                    card.id = generateId(card);
                     card.winstreak = 0;
                     card.timesAnswered += 0;
                     card.timesAnsweredCorrectly = 0;
@@ -117,6 +121,10 @@ services.factory('CardService', ['CardRepository',
 //                    this.add(card);
                     cards = cardRepository.getAll();
 
+                },
+
+                exists: function (card) {
+                    return cardRepository.exists(generateId(card), card.ID);
                 }
             }
         }]
@@ -227,7 +235,7 @@ services.factory("CardRepository", [
     function () {
         var db = new localStorageDB("cartaflash", localStorage);
 
-        if (false) {
+        if (true) {
             db.dropTable("cards");
             db.createTable("cards",
                 ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
@@ -237,14 +245,14 @@ services.factory("CardRepository", [
 
         return {
             getAll: function () {
-                return db.query("cards");
+                var result =  db.queryAll("cards", { sort: [["lastUpdated", "DESC"]] });
+                return result;
             },
 
             add: function (card) {
                 card.lastUpdated = Date.now();
                 var id = db.insert("cards", card);
                 db.commit();
-                console.log(db.query("cards", { front: "a" }));
                 return id;
             },
 
@@ -260,6 +268,19 @@ services.factory("CardRepository", [
             delete: function (id) {
                 db.deleteRows("cards", { id: id });
                 db.commit();
+            },
+
+            exists: function (id, excludeId) {
+                var result = null;
+                if (typeof excludeId !== "undefined") {
+                    result = db.query("cards", function (row) {
+                        return row.id === id && row.ID !== excludeId;
+                    });
+                }
+                else {
+                    result = db.query("cards", { id: id });
+                }
+                return result.length > 0;
             }
         }
     }

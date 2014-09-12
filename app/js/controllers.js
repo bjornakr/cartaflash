@@ -161,16 +161,30 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
                 && text.trim() !== "";
         }
 
+        function addCard (card) {
+            $cardService.add(card);
+            lastUpdatedCard = angular.copy(card);
+            $scope.card = null;
+        };
+
+        function updateCard (card) {
+            $cardService.update(card);
+            $scope.cancelEdit();
+            lastUpdatedCard = card;
+        };
 
         $scope.getAllCards = function () {
             return $cardService.getAll();
         };
 
-        $scope.addCard = function (card) {
-            $cardService.add(card);
-            lastUpdatedCard = angular.copy(card);
-            $scope.card = null;
-        };
+        $scope.saveCard = function (card) {
+            if ($scope.isEditing(card)) {
+                updateCard(card);
+            }
+            else {
+                addCard(card);
+            }
+        }
 
         $scope.deleteCard = function (card) {
             lastUpdatedCard = null;
@@ -181,11 +195,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
             $cardService.delete(card);
         };
 
-        $scope.updateCard = function (card) {
-            $cardService.update(card);
-            $scope.cancelEdit();
-            lastUpdatedCard = card;
-        };
+
 
         $scope.isRecentlyAdded = function (card) {
             return lastUpdatedCard !== null
@@ -232,13 +242,14 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         };
 
         $scope.formHasValidInput = function () {
-            console.log("VI");
-            console.log($scope.card);
-
             return typeof $scope.card !== "undefined"
                 && $scope.card !== null
                 && hasInput($scope.card.front)
                 && hasInput($scope.card.back);
+        }
+
+        $scope.exists = function (card) {
+            return this.formHasValidInput(card) && $cardService.exists(card);
         }
 
     }

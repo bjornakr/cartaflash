@@ -36,16 +36,15 @@
                     ng-click="cancelEdit()">
                 <span class="glyphicon glyphicon-ban-circle"></span>
             </button>
-            <button class="btn btn-success"
-                    ng-if="isEditing(card)"
-                    ng-disabled="!formHasValidInput()"
-                    ng-click="updateCard(card)">
-                <span class="glyphicon glyphicon-save"></span>
-            </button>
+            <!--<button class="btn btn-success"-->
+                    <!--ng-if="isEditing(card)"-->
+                    <!--ng-disabled="!formHasValidInput()"-->
+                    <!--ng-click="updateCard(card)">-->
+                <!--<span class="glyphicon glyphicon-save"></span>-->
+            <!--</button>-->
             <button class="btn btn-primary"
-                    ng-if="!isEditing(card)"
-                    ng-disabled="!formHasValidInput()"
-                    ng-click="addCard(card)">
+                    ng-disabled="!formHasValidInput() || exists(card)"
+                    ng-click="saveCard(card)">
                 <span class="glyphicon glyphicon-save"></span>
             </button>
         </div>
@@ -63,11 +62,15 @@
     <button ng-click="undoDelete()" class="btn btn-default btn-sm pull-right">Undo</button>
 </div>
 
+<!-- DUPLICATE CARD ERROR MESSAGE -->
+<div ng-if="exists(card)" class="alert alert-danger" style="overflow:hidden" role="alert">
+    <span class="glyphicon glyphicon-ban-circle"></span> Card already exists: {{ card.front }} | {{ card.back }}
+</div>
 
 <!-- FILTER INPUT -->
 <div class="input-group">
     <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-    <input ng-model="searchTerm" type="text" class="form-control">
+    <input ng-model="searchText" type="text" class="form-control">
 </div>
 
 <div class="vspace10"></div>
@@ -79,7 +82,7 @@
     <th>ES</th>
     </thead>
     <tbody>
-    <tr ng-repeat="card in getAllCards() track by card.id | filter:searchTerm"
+    <tr ng-repeat="card in getAllCards() | filter:searchText track by card.id"
         ng-class="{ success: isRecentlyAdded(card), info: isEditing(card) }"
         class="table-with-button"
         ng-click="editCard(card)">
