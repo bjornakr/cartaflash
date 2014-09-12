@@ -38,11 +38,13 @@
             </button>
             <button class="btn btn-success"
                     ng-if="isEditing(card)"
+                    ng-disabled="!formHasValidInput()"
                     ng-click="updateCard(card)">
                 <span class="glyphicon glyphicon-save"></span>
             </button>
             <button class="btn btn-primary"
                     ng-if="!isEditing(card)"
+                    ng-disabled="!formHasValidInput()"
                     ng-click="addCard(card)">
                 <span class="glyphicon glyphicon-save"></span>
             </button>

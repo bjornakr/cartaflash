@@ -39,7 +39,7 @@ services.factory('KeyPressService', [
 
 services.factory('CardService', ['CardRepository',
         function (cardRepository) {
-            var cards = cardRepository.loadCards();
+            var cards = cardRepository.getAll();
 //            var totalNumberOfCards = 0;
 
             return {
@@ -75,6 +75,7 @@ services.factory('CardService', ['CardRepository',
 //                    console.log("!!!!!!!!");
 //                    console.log(cardRepository.loadCards());
 //                    return cardRepository.loadCards();
+//                    return cardRepository.getAll();
                     return cards;
                 },
 
@@ -85,31 +86,37 @@ services.factory('CardService', ['CardRepository',
                     card.timesAnsweredCorrectly = 0;
                     card.lastVisitedTime = null;
 
-                    cards.unshift(angular.copy(card));
-                    localStorage["cards"] = JSON.stringify(cards);
-                    console.log(localStorage["cards"]);
+//                    var cardCopy = angular.copy(card);
+//                    cards.unshift(cardCopy);
+                    cardRepository.add(card);
+                    cards = cardRepository.getAll();
+//                    localStorage["cards"] = JSON.stringify(cards);
                 },
 
-                // TODO: Rename
                 delete: function (card) {
-                    console.log("Delete: " + card);
-                    var cardIndex = cards.indexOf(card);
-                    if (cardIndex !== -1) {
-                        cards.splice(cardIndex, 1);
-                    }
-                    localStorage["cards"] = JSON.stringify(cards);
+//                    console.log("Delete: " + card);
+//                    var cardIndex = cards.indexOf(card);
+//                    if (cardIndex !== -1) {
+//                        cards.splice(cardIndex, 1);
+//                    }
+//                    localStorage["cards"] = JSON.stringify(cards);
+                    cardRepository.delete(card.id);
+                    cards = cardRepository.getAll();
                 },
 
                 update: function (card) {
-                    console.log("Update: " + card)
-                    var cardToBeUpdated = null;
-                    for (var i = 0; i < cards.length; i++) {
-                        if (card.id === cards[i].id) {
-                            cardToBeUpdated = cards[i];
-                        }
-                    }
-                    this.delete(cardToBeUpdated);
-                    this.add(card);
+                    cardRepository.update(card);
+//                    console.log("Update: " + card)
+//                    var cardToBeUpdated = null;
+//                    for (var i = 0; i < cards.length; i++) {
+//                        if (card.id === cards[i].id) {
+//                            cardToBeUpdated = cards[i];
+//                        }
+//                    }
+//                    this.delete(cardToBeUpdated);
+//                    this.add(card);
+                    cards = cardRepository.getAll();
+
                 }
             }
         }]
@@ -205,8 +212,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 }
 
                 // 4) If there is still space, add more already lerned cards
-                for (i = 0; i < learnedCards.length; i++)
-                {
+                for (i = 0; i < learnedCards.length; i++) {
 
                 }
 
@@ -216,76 +222,121 @@ services.factory('PracticeSessionService', ['CardRepository',
     }
 ]);
 
-services.factory("CardRepository", ["$http",
-        function ($http) {
-            var idCounter = 0;
 
-            function loadCardsFromFile() {
-                var cards = [];
+services.factory("CardRepository", [
+    function () {
+        var db = new localStorageDB("cartaflash", localStorage);
 
-                $http.get('cards.json').success(function (data) {
-//                    var cards = [];
-                    for (var i = 0; i < data.length; i++) {
-                        cards.push(data[i]);
-                        cards[i].id = cards[i].front + cards[i].back;
-                        console.log("pushing: " + cards[i]);
-                        idCounter++;
-                    }
-//                        totalNumberOfCards = cards.length;
-//                        console.log("Final: " + JSON.stringify(cards));
-//                        localStorage["cards"] = JSON.stringify(cards);
+        if (false) {
+            db.dropTable("cards");
+            db.createTable("cards",
+                ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
+                    "winstreak", "lastVisitedTime", "lastUpdated"]);
+            db.commit();
+        }
+
+        return {
+            getAll: function () {
+                return db.query("cards");
+            },
+
+            add: function (card) {
+                card.lastUpdated = Date.now();
+                var id = db.insert("cards", card);
+                db.commit();
+                console.log(db.query("cards", { front: "a" }));
+                return id;
+            },
+
+            update: function (card) {
+                card.lastUpdated = Date.now();
+                db.update("cards", { id: card.id }, function (modifiedCard) {
+                    modifiedCard = angular.copy(card);
+                    return modifiedCard;
                 });
-                return cards;
-            };
-//                loadCurrentCardDeck: function () {
-//                    return loadCards()["current"];
-//                }
-            function loadCardsFromStorage() {
-                var cardsFromStorage = [];
-//                localStorage.removeItem("cards");
-                if (typeof(localStorage["cards"]) !== "undefined") {
-                    cardsFromStorage = JSON.parse(localStorage["cards"]);
-                }
-                var cards = [];
-                for (var i = 0; i < cardsFromStorage.length; i++) {
-//                    console.log(cardsFromStorage[i]);
-                    cards.push(cardsFromStorage[i]);
-                    cards[i].id = cards[i].front + cards[i].back;
-                    idCounter++;
-                }
-                return cards;
-//                console.log(localStorage["cards"]);
-            };
+                db.commit();
+            },
 
-
-            return {
-                loadCards: function () {
-                    var cards = loadCardsFromStorage();
-                    console.log("CARDS:");
-                    console.log(cards);
-                    return cards;
-                },
-
-                getNextId: function () {
-                    var nextId = idCounter;
-                    idCounter++;
-                    return nextId;
-                },
-
-                update: function (card) {
-                    console.log("UPDATE");
-                    console.log(card);
-                    var allCards = this.loadCards();
-
-                    for (var i = 0; i < allCards.length; i++) {
-                        if (card.id === allCards[i].id) {
-                            console.log("MEGAMATCH!");
-                            allCards[i] = card;
-                        }
-                    }
-                    localStorage["cards"] = JSON.stringify(allCards);
-                }
+            delete: function (id) {
+                db.deleteRows("cards", { id: id });
+                db.commit();
             }
-        }]
-);
+        }
+    }
+])
+;
 
+
+//services.factory("CardRepository2", ["$http",
+//        function ($http) {
+//            var idCounter = 0;
+//
+//            function loadCardsFromFile() {
+//                var cards = [];
+//
+//                $http.get('cards.json').success(function (data) {
+////                    var cards = [];
+//                    for (var i = 0; i < data.length; i++) {
+//                        cards.push(data[i]);
+//                        cards[i].id = cards[i].front + cards[i].back;
+//                        console.log("pushing: " + cards[i]);
+//                        idCounter++;
+//                    }
+////                        totalNumberOfCards = cards.length;
+////                        console.log("Final: " + JSON.stringify(cards));
+////                        localStorage["cards"] = JSON.stringify(cards);
+//                });
+//                return cards;
+//            };
+////                loadCurrentCardDeck: function () {
+////                    return loadCards()["current"];
+////                }
+//            function loadCardsFromStorage() {
+//                var cardsFromStorage = [];
+////                localStorage.removeItem("cards");
+//                if (typeof(localStorage["cards"]) !== "undefined") {
+//                    cardsFromStorage = JSON.parse(localStorage["cards"]);
+//                }
+//                var cards = [];
+//                for (var i = 0; i < cardsFromStorage.length; i++) {
+////                    console.log(cardsFromStorage[i]);
+//                    cards.push(cardsFromStorage[i]);
+//                    cards[i].id = cards[i].front + cards[i].back;
+//                    idCounter++;
+//                }
+//                return cards;
+////                console.log(localStorage["cards"]);
+//            };
+//
+//
+//            return {
+//                loadCards: function () {
+//                    var cards = loadCardsFromStorage();
+//                    console.log("CARDS:");
+//                    console.log(cards);
+//                    return cards;
+//                },
+//
+//                getNextId: function () {
+//                    var nextId = idCounter;
+//                    idCounter++;
+//                    return nextId;
+//                },
+//
+//                update: function (card) {
+//                    console.log("UPDATE");
+//                    console.log(card);
+//                    var allCards = this.loadCards();
+//
+//                    for (var i = 0; i < allCards.length; i++) {
+//                        if (card.id === allCards[i].id) {
+//                            console.log("MEGAMATCH!");
+//                            allCards[i] = card;
+//                        }
+//                    }
+//                    localStorage["cards"] = JSON.stringify(allCards);
+//                }
+//            }
+//        }]
+//);
+//
