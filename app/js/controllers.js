@@ -3,12 +3,6 @@
 /* Controllers */
 
 var controllers = angular.module('cartaflash.controllers', []);
-//    .controller('MyCtrl1', ['$scope', function ($scope) {
-//
-//    }])
-//    .controller('MyCtrl2', ['$scope', function ($scope) {
-//
-//    }])
 
 controllers.controller('KeyEventController', ['$scope', 'KeyPressService',
     function ($scope, $keyPressService) {
@@ -74,20 +68,26 @@ controllers.controller('CardController',
                 else {
                     answerIsRevealed = false;
                     currentCardIndex++;
+                    console.log("cci2: " + currentCardIndex);
+
                     if (currentCardIndex >= $scope.getTotalNumberOfCards()) {
+                        console.log("OUCH!");
                         currentCardIndex = 0;
                     }
-                    currentCard.front = cards[currentCardIndex].front;
-                    currentCard.back = '';
-                    console.log("New card: " + currentCard.front + ' / ' + currentCard.back);
-                    console.log(originalDeck.length);
+//                    currentCard = cards[currentCardIndex];
+                    console.log("cci: " + currentCardIndex);
+                    currentCard = cardRepository.getById(cards[currentCardIndex].id);
+
+//                    currentCard.front = cards[currentCardIndex].front;
+//                    currentCard.back = '';
                 }
             };
 
             $scope.win = function () {
-                console.log("WIN!");
                 practiceSessionService.win(cards[currentCardIndex]);
+                console.log(cards);
                 cards.splice(currentCardIndex, 1);
+                console.log(cards);
                 currentCardIndex -= 1;
                 $scope.nextCard();
             };
@@ -104,9 +104,7 @@ controllers.controller('CardController',
 
             $scope.revealAnswer = function () {
                 answerIsRevealed = true;
-                currentCard.back = cards[currentCardIndex].back;
-//            console.log("Reveal!");
-//            console.log("WHOO: " + $keyPressService.getKeypress());
+//                currentCard.back = cards[currentCardIndex].back;
             };
 
             $scope.passKeyboardInput = function (keyEvent) {
@@ -130,12 +128,14 @@ controllers.controller('CardController',
             };
 
             $scope.startSession = function () {
-                var allCards = cardRepository.getAll();
-                cards = practiceSessionService.createPracticeCardDeck(allCards);
-                currentCard = cards[0];
+//                var allCards = cardRepository.getAll();
+                cards = practiceSessionService.createPracticeCardDeck();
+                currentCardIndex = -1;
                 originalDeckSize = cards.length;
                 isSessionStarted = true;
                 originalDeck = angular.copy(cards);
+//                currentCard = cards[0];
+                $scope.nextCard();
 //            $scope.currentCard = $scope.cards[currentCardIndex];
             };
 
@@ -147,13 +147,23 @@ controllers.controller('CardController',
     ]);
 
 
+controllers.controller("ImportExportController", ["$scope",
+   function ($scope) {
+       $scope.click = function () {
+           window.prompt("Copy to clipboard: Ctrl+C, Enter", "Ayayayayaya!");
+           console.log("POW!");
+       }
+   }
+]);
+
+
 controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
-    function ($scope, $http, $cardService) {
-//        $cardService.loadCards();
+    function ($scope, $http, cardService) {
         var lastUpdatedCard = null;
         var lastDeletedCard = null;
         var cardForEdit = null;
         var cardBeforeEdit = null;
+        var importedCards = [];
 
         function hasInput(text) {
             return typeof text !== "undefined"
@@ -162,19 +172,19 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         }
 
         function addCard (card) {
-            $cardService.add(card);
+            cardService.add(card);
             lastUpdatedCard = angular.copy(card);
             $scope.card = null;
-        };
+        }
 
         function updateCard (card) {
-            $cardService.update(card);
+            cardService.update(card);
             $scope.cancelEdit();
             lastUpdatedCard = card;
-        };
+        }
 
         $scope.getAllCards = function () {
-            return $cardService.getAll();
+            return cardService.getAll();
         };
 
         $scope.saveCard = function (card) {
@@ -184,7 +194,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
             else {
                 addCard(card);
             }
-        }
+        };
 
         $scope.deleteCard = function (card) {
             lastUpdatedCard = null;
@@ -192,7 +202,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
             if ($scope.isEditing(card)) {
                 $scope.cancelEdit();
             }
-            $cardService.delete(card);
+            cardService.delete(card);
         };
 
 
@@ -213,7 +223,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
 
         $scope.undoDelete = function () {
 //            $scope.addCard(lastDeletedCard);
-            $cardService.add(lastDeletedCard);
+            cardService.add(lastDeletedCard);
             lastUpdatedCard = angular.copy(lastDeletedCard);
             lastDeletedCard = null;
 
@@ -222,8 +232,6 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         $scope.editCard = function (card) {
             cardForEdit = card;
             $scope.card = angular.copy(card);
-            console.log(card);
-
         };
 
         $scope.isEditing = function (card) {
@@ -246,11 +254,28 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
                 && $scope.card !== null
                 && hasInput($scope.card.front)
                 && hasInput($scope.card.back);
-        }
+        };
 
         $scope.exists = function (card) {
-            return this.formHasValidInput(card) && $cardService.exists(card);
+            return this.formHasValidInput(card) && cardService.exists(card);
+        };
+
+        $scope.isImported = function (card) {
+            return importedCards.indexOf(card.id) >= 0;
         }
 
+        $scope.importCards = function (rawCardData) {
+            var lines = rawCardData.split("\n");
+            for (var i = 0; i < lines.length; i++) {
+                var sides = lines[i].split("|");
+                if (sides.length === 2) {
+                    var card = {};
+                    card.front = sides[0];
+                    card.back = sides[1];
+                    cardService.add(card);
+                    importedCards.push(card.id);
+                }
+            }
+        }
     }
 ]);

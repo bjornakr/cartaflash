@@ -136,3 +136,11 @@ div.alert-warning p.pull-left {
 .button-container {
     height: 50px;
 }
+
+.import-examples {
+    /*font-size: 20px;*/
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    /*font-family: "Monaco";*/
+}

@@ -2,9 +2,6 @@
 
 /* Services */
 
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
 var services = angular.module('cartaflash.services', []);
 
 services.factory('KeyPressService', [
@@ -12,26 +9,26 @@ services.factory('KeyPressService', [
             var LEFT_ARROW = 37;
             var RIGHT_ARROW = 39;
             var DOWN_ARROW = 40;
-            this.keyCode = 0;
+            var _keyCode = 0;
 
             return {
                 getKeypress: function () {
-                    return this.keyCode;
+                    return _keyCode;
                 },
                 setKeypress: function (keyCode) {
-                    this.keyCode = keyCode;
+                    _keyCode = keyCode;
                 },
                 hasKeySuccess: function () {
-                    return this.keyCode === RIGHT_ARROW;
+                    return _keyCode === RIGHT_ARROW;
                 },
                 hasKeyFail: function () {
-                    return this.keyCode === LEFT_ARROW;
+                    return _keyCode === LEFT_ARROW;
                 },
                 hasKeyRevealAnswer: function () {
-                    return this.keyCode === DOWN_ARROW;
+                    return _keyCode === DOWN_ARROW;
                 },
                 clearInput: function () {
-                    this.keyCode = 0;
+                    _keyCode = 0;
                 }
             }
         }]
@@ -40,85 +37,38 @@ services.factory('KeyPressService', [
 services.factory('CardService', ['CardRepository',
         function (cardRepository) {
             var cards = cardRepository.getAll();
-//            var totalNumberOfCards = 0;
 
             function generateId(card) {
                 return card.front.toUpperCase() + "|" + card.back.toUpperCase();
             }
 
             return {
-//                loadCards: function () {
-//                    $http.get('cards.json').success(function (data) {
-//                        cards = [];
-//                        for (var i = 0; i < data.length; i++) {
-//                            cards.push(data[i]);
-//                            cards[i].id = idCounter;
-//                            idCounter++;
-//                        }
-//                        totalNumberOfCards = cards.length;
-//                        console.log("Final: " + JSON.stringify(cards));
-//                        localStorage["cards"] = JSON.stringify(cards);
-//                    });
-//                },
-
-//                loadCards: function () {
-//
-//                    var cardsFromStorage = JSON.parse(localStorage["cards"]);
-//                    cards = [];
-//                    for (var i = 0; i < cardsFromStorage.length; i++) {
-//                        console.log(cardsFromStorage[i]);
-//                        cards.push(cardsFromStorage[i]);
-//                        cards[i].id = idCounter;
-//                        idCounter++;
-//                    }
-//                    totalNumberOfCards = cards.length;
-//                    console.log(localStorage["cards"]);
-//                },
-
                 getAll: function () {
-//                    console.log("!!!!!!!!");
-//                    console.log(cardRepository.loadCards());
-//                    return cardRepository.loadCards();
-//                    return cardRepository.getAll();
                     return cards;
                 },
 
                 add: function (card) {
+                    card.front = card.front.trim();
+                    card.back = card.back.trim();
                     card.id = generateId(card);
                     card.winstreak = 0;
                     card.timesAnswered += 0;
                     card.timesAnsweredCorrectly = 0;
                     card.lastVisitedTime = null;
 
-//                    var cardCopy = angular.copy(card);
-//                    cards.unshift(cardCopy);
-                    cardRepository.add(card);
+                    if (!this.exists(card)) {
+                        cardRepository.add(card);
+                    }
                     cards = cardRepository.getAll();
-//                    localStorage["cards"] = JSON.stringify(cards);
                 },
 
                 delete: function (card) {
-//                    console.log("Delete: " + card);
-//                    var cardIndex = cards.indexOf(card);
-//                    if (cardIndex !== -1) {
-//                        cards.splice(cardIndex, 1);
-//                    }
-//                    localStorage["cards"] = JSON.stringify(cards);
                     cardRepository.delete(card.id);
                     cards = cardRepository.getAll();
                 },
 
                 update: function (card) {
                     cardRepository.update(card);
-//                    console.log("Update: " + card)
-//                    var cardToBeUpdated = null;
-//                    for (var i = 0; i < cards.length; i++) {
-//                        if (card.id === cards[i].id) {
-//                            cardToBeUpdated = cards[i];
-//                        }
-//                    }
-//                    this.delete(cardToBeUpdated);
-//                    this.add(card);
                     cards = cardRepository.getAll();
 
                 },
@@ -133,7 +83,7 @@ services.factory('CardService', ['CardRepository',
 
 services.factory('PracticeSessionService', ['CardRepository',
     function (cardRepository) {
-        var PRACTICE_CARD_DECK_SIZE = 3;
+        var PRACTICE_CARD_DECK_SIZE = 3; // TODO: Move to configuration service
         var REQUIRED_WINSTREAK_FOR_LEARN = 2;
 
 
@@ -142,7 +92,7 @@ services.factory('PracticeSessionService', ['CardRepository',
             return (time1 - time2) / oneDay;
         }
 
-        function compareLearnedCards(card1, card2) {
+        function compareScore(card1, card2) {
             var card1Score = card1.timesAnsweredCorrectly / card1.timesAnswered;
             var card2Score = card2.timesAnsweredCorrectly / card2.timesAnswered;
 
@@ -151,6 +101,13 @@ services.factory('PracticeSessionService', ['CardRepository',
             if (card1Score > card2Score)
                 return 1;
             return 0;
+        }
+
+        function isEligibleForReview(card) {
+            var additionalWinstreak = card.winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
+            var waitDays = Math.pow(2, additionalWinstreak);
+            var daysSinceLastVisit = calculateDayDiff(card.lastVisitedTime, Date.now());
+            return (waitDays - daysSinceLastVisit <= 0);
         }
 
         return {
@@ -170,11 +127,16 @@ services.factory('PracticeSessionService', ['CardRepository',
                 cardRepository.update(card);
             },
 
-            createPracticeCardDeck: function (cards) {
+            createPracticeCardDeck: function () {
                 var cardsForPractice = [];
                 var learnedCards = [];
                 var activeCards = [];
                 var pendingCards = [];
+                var cards = cardRepository.getAll();
+
+                if (cards.length < PRACTICE_CARD_DECK_SIZE) {
+                    PRACTICE_CARD_DECK_SIZE = cards.length;
+                }
 
                 var i;
 
@@ -193,40 +155,68 @@ services.factory('PracticeSessionService', ['CardRepository',
                     }
                 }
 
+//                learnedCards.sort(function (card1, card2) {
+//                    if (card1.lastVisitedTime > card2.lastVisitedTime) {
+//                        return 1;
+//                    }
+//                    else {
+//                        return -1;
+//                    }
+//                });
+//                console.log(learnedCards);
+
                 // 1) Add learned cards for repetition
                 for (i = 0; i < learnedCards.length
                     && cardsForPractice.length < PRACTICE_CARD_DECK_SIZE; i++) {
-                    var additionalWinstreak = learnedCards[i].winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
-                    var waitDays = Math.pow(2, additionalWinstreak);
-                    console.log("LVD: " + learnedCards[i].lastVisitedTime);
-                    console.log("NOW: " + Date.now());
-                    var daysSinceLastVisit = calculateDayDiff(learnedCards[i].lastVisitedTime, Date.now()); // 0; //TODO: Something
-                    if (waitDays - daysSinceLastVisit <= 0) {
+//                    var additionalWinstreak = learnedCards[i].winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
+//                    var waitDays = Math.pow(2, additionalWinstreak);
+//                    console.log("LVD: " + learnedCards[i].lastVisitedTime);
+//                    console.log("NOW: " + Date.now());
+//                    var daysSinceLastVisit = calculateDayDiff(learnedCards[i].lastVisitedTime, Date.now()); // 0; //TODO: Something
+//                    if (waitDays - daysSinceLastVisit <= 0) {
+                    if (isEligibleForReview(learnedCards[i])) {
                         cardsForPractice.push(learnedCards[i]);
+                        console.log("Adding learned card " + learnedCards[i].id + " for repetition.");
                     }
+
                 }
 
                 // 2) Add cards that are currently being practiced
-                activeCards.sort(compareLearnedCards);
+                activeCards.sort(compareScore);
                 for (i = 0; i < activeCards.length
                     && cardsForPractice.length < PRACTICE_CARD_DECK_SIZE; i++) {
                     cardsForPractice.push(activeCards[i]);
+                    console.log("Adding currently practiced card " + activeCards[i].id)
                 }
 
                 // 3) Add new cards
                 for (i = 0; i < pendingCards.length
                     && cardsForPractice.length < PRACTICE_CARD_DECK_SIZE; i++) {
                     cardsForPractice.push(pendingCards[i]);
+                    console.log("Adding new card " + pendingCards[i].id)
                 }
 
                 // 4) If there is still space, add more already lerned cards
-                for (i = 0; i < learnedCards.length; i++) {
-
+                if (cardsForPractice.length < PRACTICE_CARD_DECK_SIZE) {
+                    for (i = 0; i < learnedCards.length
+                             && cardsForPractice.length < PRACTICE_CARD_DECK_SIZE; i++) {
+                        if (cardsForPractice.indexOf(learnedCards[i]) < 0) {
+                            cardsForPractice.push(learnedCards[i]);
+                            console.log("Adding additional already learned card " + learnedCards[i].id)
+                        }
+                    }
                 }
 
                 return cardsForPractice;
             }
         };
+    }
+]);
+
+
+services.factory("ImportExportService", [
+    function () {
+
     }
 ]);
 
@@ -240,13 +230,25 @@ services.factory("CardRepository", [
             db.createTable("cards",
                 ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
                     "winstreak", "lastVisitedTime", "lastUpdated"]);
+            db.insert("cards", { id: "SER|TO BE", front:"Ser", back:"To be"});
+            db.insert("cards", { id: "HACER|TO DO", front:"Hacer", back:"To do"});
+            db.insert("cards", { id: "DESVANECER|TO FADE", front:"Desvanecer", back:"To fade"});
+            db.insert("cards", { id: "NALGEAR|TO SPANK", front:"Nalgear", back:"To spank"});
+            db.insert("cards", { id: "CHIFLADO|MADMAN", front:"Chiflado", back:"Madman"});
             db.commit();
         }
 
         return {
             getAll: function () {
-                var result =  db.queryAll("cards", { sort: [["lastUpdated", "DESC"]] });
+                var result = db.queryAll("cards", { sort: [
+                    ["lastUpdated", "DESC"]
+                ] });
                 return result;
+            },
+
+            getById: function (id) {
+                var result = db.query("cards", { id: id });
+                return result[0];
             },
 
             add: function (card) {
@@ -286,78 +288,3 @@ services.factory("CardRepository", [
     }
 ])
 ;
-
-
-//services.factory("CardRepository2", ["$http",
-//        function ($http) {
-//            var idCounter = 0;
-//
-//            function loadCardsFromFile() {
-//                var cards = [];
-//
-//                $http.get('cards.json').success(function (data) {
-////                    var cards = [];
-//                    for (var i = 0; i < data.length; i++) {
-//                        cards.push(data[i]);
-//                        cards[i].id = cards[i].front + cards[i].back;
-//                        console.log("pushing: " + cards[i]);
-//                        idCounter++;
-//                    }
-////                        totalNumberOfCards = cards.length;
-////                        console.log("Final: " + JSON.stringify(cards));
-////                        localStorage["cards"] = JSON.stringify(cards);
-//                });
-//                return cards;
-//            };
-////                loadCurrentCardDeck: function () {
-////                    return loadCards()["current"];
-////                }
-//            function loadCardsFromStorage() {
-//                var cardsFromStorage = [];
-////                localStorage.removeItem("cards");
-//                if (typeof(localStorage["cards"]) !== "undefined") {
-//                    cardsFromStorage = JSON.parse(localStorage["cards"]);
-//                }
-//                var cards = [];
-//                for (var i = 0; i < cardsFromStorage.length; i++) {
-////                    console.log(cardsFromStorage[i]);
-//                    cards.push(cardsFromStorage[i]);
-//                    cards[i].id = cards[i].front + cards[i].back;
-//                    idCounter++;
-//                }
-//                return cards;
-////                console.log(localStorage["cards"]);
-//            };
-//
-//
-//            return {
-//                loadCards: function () {
-//                    var cards = loadCardsFromStorage();
-//                    console.log("CARDS:");
-//                    console.log(cards);
-//                    return cards;
-//                },
-//
-//                getNextId: function () {
-//                    var nextId = idCounter;
-//                    idCounter++;
-//                    return nextId;
-//                },
-//
-//                update: function (card) {
-//                    console.log("UPDATE");
-//                    console.log(card);
-//                    var allCards = this.loadCards();
-//
-//                    for (var i = 0; i < allCards.length; i++) {
-//                        if (card.id === allCards[i].id) {
-//                            console.log("MEGAMATCH!");
-//                            allCards[i] = card;
-//                        }
-//                    }
-//                    localStorage["cards"] = JSON.stringify(allCards);
-//                }
-//            }
-//        }]
-//);
-//
