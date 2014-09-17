@@ -144,3 +144,7 @@ div.alert-warning p.pull-left {
     margin: 0;
     /*font-family: "Monaco";*/
 }
+
+.giga {
+    font-size: 100px;
+}

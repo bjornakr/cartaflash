@@ -41,15 +41,15 @@ controllers.controller('CardController',
 
             $scope.$on("key-pressed", function () {
                     if (isSessionStarted && !isSessionFinished) {
-                        if (keyPressService.hasKeyRevealAnswer()) {
+                        if (keyPressService.hasDownArrow()) {
                             $scope.revealAnswer();
                             $scope.testOutput = "Reveal answer.";
                         }
                         else if (answerIsRevealed) {
-                            if (keyPressService.hasKeyFail()) {
-                                $scope.nextCard();
+                            if (keyPressService.hasLeftArrow()) {
+                                $scope.lose();
                             }
-                            else if (keyPressService.hasKeySuccess()) {
+                            else if (keyPressService.hasRightArrow()) {
                                 $scope.win();
                             }
                         }
@@ -68,26 +68,17 @@ controllers.controller('CardController',
                 else {
                     answerIsRevealed = false;
                     currentCardIndex++;
-                    console.log("cci2: " + currentCardIndex);
 
                     if (currentCardIndex >= $scope.getTotalNumberOfCards()) {
-                        console.log("OUCH!");
                         currentCardIndex = 0;
                     }
-//                    currentCard = cards[currentCardIndex];
-                    console.log("cci: " + currentCardIndex);
                     currentCard = cardRepository.getById(cards[currentCardIndex].id);
-
-//                    currentCard.front = cards[currentCardIndex].front;
-//                    currentCard.back = '';
                 }
             };
 
             $scope.win = function () {
                 practiceSessionService.win(cards[currentCardIndex]);
-                console.log(cards);
                 cards.splice(currentCardIndex, 1);
-                console.log(cards);
                 currentCardIndex -= 1;
                 $scope.nextCard();
             };
@@ -104,7 +95,6 @@ controllers.controller('CardController',
 
             $scope.revealAnswer = function () {
                 answerIsRevealed = true;
-//                currentCard.back = cards[currentCardIndex].back;
             };
 
             $scope.passKeyboardInput = function (keyEvent) {
@@ -128,15 +118,12 @@ controllers.controller('CardController',
             };
 
             $scope.startSession = function () {
-//                var allCards = cardRepository.getAll();
                 cards = practiceSessionService.createPracticeCardDeck();
                 currentCardIndex = -1;
                 originalDeckSize = cards.length;
                 isSessionStarted = true;
                 originalDeck = angular.copy(cards);
-//                currentCard = cards[0];
                 $scope.nextCard();
-//            $scope.currentCard = $scope.cards[currentCardIndex];
             };
 
             $scope.getOriginalDeck = function () {
@@ -156,6 +143,12 @@ controllers.controller("ImportExportController", ["$scope",
    }
 ]);
 
+
+controllers.controller("ConfigController", ["$scope",
+    function ($scope) {
+
+    }
+]);
 
 controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
     function ($scope, $http, cardService) {
@@ -222,7 +215,6 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         };
 
         $scope.undoDelete = function () {
-//            $scope.addCard(lastDeletedCard);
             cardService.add(lastDeletedCard);
             lastUpdatedCard = angular.copy(lastDeletedCard);
             lastDeletedCard = null;

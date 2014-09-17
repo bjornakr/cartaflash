@@ -18,18 +18,18 @@ services.factory('KeyPressService', [
                 setKeypress: function (keyCode) {
                     _keyCode = keyCode;
                 },
-                hasKeySuccess: function () {
+                hasRightArrow: function () {
                     return _keyCode === RIGHT_ARROW;
                 },
-                hasKeyFail: function () {
+                hasLeftArrow: function () {
                     return _keyCode === LEFT_ARROW;
                 },
-                hasKeyRevealAnswer: function () {
+                hasDownArrow: function () {
                     return _keyCode === DOWN_ARROW;
                 },
-                clearInput: function () {
-                    _keyCode = 0;
-                }
+//                clearInput: function () {
+//                    _keyCode = 0;
+//                }
             }
         }]
 );
@@ -121,7 +121,7 @@ services.factory('PracticeSessionService', ['CardRepository',
             },
 
             lose: function (card) {
-                card.winstreak += 0;
+                card.winstreak = 0;
                 card.timesAnswered += 1;
                 card.lastVisitedTime = Date.now();
                 cardRepository.update(card);
@@ -146,7 +146,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                         pendingCards.push(cards[i]);
                     }
                     else {
-                        if (cards[i].winstreak > REQUIRED_WINSTREAK_FOR_LEARN) {
+                        if (cards[i].winstreak >= REQUIRED_WINSTREAK_FOR_LEARN) {
                             learnedCards.push(cards[i]);
                         }
                         else {
@@ -196,8 +196,16 @@ services.factory('PracticeSessionService', ['CardRepository',
                     console.log("Adding new card " + pendingCards[i].id)
                 }
 
-                // 4) If there is still space, add more already lerned cards
+                // 4) If there is still space, add more already learned cards
                 if (cardsForPractice.length < PRACTICE_CARD_DECK_SIZE) {
+                    learnedCards.sort(function (card1, card2) {
+                    if (card1.lastVisitedTime > card2.lastVisitedTime) {
+                        return 1;
+                    }
+                    else {
+                        return -1;
+                    }
+                });
                     for (i = 0; i < learnedCards.length
                              && cardsForPractice.length < PRACTICE_CARD_DECK_SIZE; i++) {
                         if (cardsForPractice.indexOf(learnedCards[i]) < 0) {
@@ -262,6 +270,7 @@ services.factory("CardRepository", [
                 card.lastUpdated = Date.now();
                 db.update("cards", { id: card.id }, function (modifiedCard) {
                     modifiedCard = angular.copy(card);
+                    console.log(modifiedCard);
                     return modifiedCard;
                 });
                 db.commit();

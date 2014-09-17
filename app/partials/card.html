@@ -50,7 +50,7 @@
 
 <div ng-if="!isSessionStarted()">
     <button ng-click="startSession()" class="btn btn-link btn-lg center-block">
-        <h1><span class="glyphicon glyphicon-play-circle"></span></h1>
+        <span class="glyphicon glyphicon-play-circle giga"></span>
     </button>
 </div>
 
@@ -76,12 +76,11 @@
 
 <div ng-if="isSessionStarted() && !isSessionFinished()" class="alert alert-info">
     <ul>
-        <li>{{ getCurrentCard().front }}</li>
-        <li>{{ getCurrentCard().back }}</li>
-        <li>{{ getCurrentCard().timesAnswered }}</li>
-        <li>{{ getCurrentCard().timesAnsweredCorrectly }}</li>
-        <li>{{ getCurrentCard().winstreak }}</li>
-        <li>{{ getCurrentCard().lastVisitedTime }}</li>
+        <li>{{ getCurrentCard().front }} | {{ getCurrentCard().back }}</li>
+        <li>Times answered: {{ getCurrentCard().timesAnswered }}</li>
+        <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }}</li>
+        <li>Winstreak: {{ getCurrentCard().winstreak }}</li>
+        <li>Last visited: {{ getCurrentCard().lastVisitedTime }}</li>
     </ul>
 
 </div>

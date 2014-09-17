@@ -15,6 +15,8 @@ angular.module('cartaflash', [
         $routeProvider.when('/', {templateUrl: 'partials/card.html', controller: 'CardController'});
         $routeProvider.when('/import-export-cards',
             { templateUrl: 'partials/import-export-cards.html', controller: 'ImportExportController' });
+        $routeProvider.when('/config',
+            { templateUrl: 'partials/config.html', controller: 'ConfigController' });
         $routeProvider.when('/todo', {templateUrl: 'partials/todo.html'});
         $routeProvider.otherwise({redirectTo: '/'});
     }]);
