@@ -18,10 +18,10 @@
         <div ng-if="answerIsRevealed()">
             <span class="glyphicon glyphicon-chevron-left chevron"></span>
 
-            <button class="btn btn-warning btn-lg" ng-click="lose()">
+            <button class="btn btn-warning btn-lg" ng-click="fail()">
                 <span class="glyphicon glyphicon-thumbs-down"></span>
             </button>
-            <button class="btn btn-success btn-lg" ng-click="win()">
+            <button class="btn btn-success btn-lg" ng-click="success()">
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
 
@@ -54,6 +54,8 @@
     </button>
 </div>
 
+
+<!--SESSION FINAL REPORT-->
 <div ng-if="isSessionFinished()">
     <div class="alert alert-success">
         <span class="glyphicon glyphicon-ok"></span> <strong>Well done!</strong>

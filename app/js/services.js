@@ -112,7 +112,7 @@ services.factory('PracticeSessionService', ['CardRepository',
 
         return {
 
-            win: function (card) {
+            success: function (card) {
                 card.winstreak += 1;
                 card.timesAnswered += 1;
                 card.timesAnsweredCorrectly += 1;
@@ -120,7 +120,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 cardRepository.update(card);
             },
 
-            lose: function (card) {
+            fail: function (card) {
                 card.winstreak = 0;
                 card.timesAnswered += 1;
                 card.lastVisitedTime = Date.now();
