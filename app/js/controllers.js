@@ -25,18 +25,32 @@ controllers.controller('NavBarController', ['$scope', '$location',
     }
 ]);
 
-controllers.controller('CardController',
+controllers.controller('PracticeSessionController',
     ['$scope', 'KeyPressService', 'CardRepository', 'PracticeSessionService',
         function ($scope, keyPressService, cardRepository, practiceSessionService) {
-            var currentCardIndex = 0;
+//            var currentCardIndex = 0;
             var answerIsRevealed = false;
             var currentCard = null;
-            var remainingCards = null;
-            var originalDeck = null;
+//            var remainingCards = null;
+//            var originalDeck = null;
+
+
+            (function () {
+                practiceSessionService.loadSession();
+                if (practiceSessionService.isSessionStarted()
+                    && !practiceSessionService.isSessionFinished()) {
+                    currentCard = practiceSessionService.nextCard();
+                }
+            })();
 
 
             $scope.$on("key-pressed", function () {
-                    if ($scope.isSessionStarted() && !$scope.isSessionFinished()) {
+                    if (!$scope.isSessionStarted()) {
+                        if (keyPressService.hasEnterKey()) {
+                            $scope.startSession();
+                        }
+                    }
+                    else if ($scope.isSessionStarted() && !$scope.isSessionFinished()) {
                         if (keyPressService.hasDownArrow()) {
                             $scope.revealAnswer();
                         }
@@ -49,6 +63,11 @@ controllers.controller('CardController',
                             }
                         }
                     }
+                    else if ($scope.isSessionFinished()) {
+                        if (keyPressService.hasEnterKey()) {
+                            $scope.restart();
+                        }
+                    }
                 }
             );
 
@@ -57,26 +76,22 @@ controllers.controller('CardController',
             };
 
             $scope.nextCard = function () {
-                if (!$scope.isSessionFinished()) {
+                if (!practiceSessionService.isSessionFinished()) {
                     answerIsRevealed = false;
-                    currentCardIndex++;
-
-                    if (currentCardIndex >= remainingCards.length) {
-                        currentCardIndex = 0;
-                    }
-                    currentCard = cardRepository.getById(remainingCards[currentCardIndex].id);
+                    currentCard = practiceSessionService.nextCard();
+                }
+                else {
+                    practiceSessionService.endSession();
                 }
             };
 
             $scope.success = function () {
-                practiceSessionService.success(remainingCards[currentCardIndex]);
-                remainingCards.splice(currentCardIndex, 1);
-                currentCardIndex -= 1;
+                practiceSessionService.success();
                 $scope.nextCard();
             };
 
             $scope.fail = function () {
-                practiceSessionService.fail(remainingCards[currentCardIndex]);
+                practiceSessionService.fail();
                 $scope.nextCard();
             };
 
@@ -85,7 +100,7 @@ controllers.controller('CardController',
             };
 
             $scope.currentProgress = function () {
-                return (1 - (remainingCards.length) / originalDeck.length) * 100;
+                return practiceSessionService.currentProgress();
             };
 
             $scope.answerIsRevealed = function () {
@@ -93,22 +108,27 @@ controllers.controller('CardController',
             };
 
             $scope.isSessionStarted = function () {
-                return remainingCards !== null;
+                return practiceSessionService.isSessionStarted();
             };
 
             $scope.isSessionFinished = function () {
-                return remainingCards !== null && remainingCards.length === 0;
+                return practiceSessionService.isSessionFinished();
             };
 
             $scope.startSession = function () {
-                remainingCards = practiceSessionService.createPracticeCardDeck();
-                originalDeck = angular.copy(remainingCards);
-                currentCardIndex = -1;
+                practiceSessionService.startSession();
+//                remainingCards = practiceSessionService.createPracticeCardDeck();
+//                originalDeck = angular.copy(remainingCards);
+//                currentCardIndex = -1;
                 $scope.nextCard();
             };
 
             $scope.getOriginalDeck = function () {
-                return originalDeck;
+                return practiceSessionService.getOriginalDeck();
+            }
+
+            $scope.restart = function() {
+                practiceSessionService.resetSession()
             }
 
         }
@@ -237,6 +257,7 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         }
 
         $scope.importCards = function (rawCardData) {
+            $scope.pastedCards = "";
             var lines = rawCardData.split("\n");
             for (var i = 0; i < lines.length; i++) {
                 var sides = lines[i].split("|");

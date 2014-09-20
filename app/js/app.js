@@ -11,7 +11,7 @@ angular.module('cartaflash', [
 ]).
     config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/practice',
-            {templateUrl: 'partials/practice.html', controller: 'CardController'});
+            {templateUrl: 'partials/practice.html', controller: 'PracticeSessionController'});
         $routeProvider.when('/edit-cards',
             {templateUrl: 'partials/edit-cards.html', controller: 'CardCrudController'});
 //        $routeProvider.when('/', {templateUrl: 'partials/practice.html', controller: 'CardController'});

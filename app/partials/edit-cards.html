@@ -25,12 +25,9 @@
             <span class="input-group-addon">ES</span>
             <input type="text" class="form-control" ng-model="card.back">
         </div>
-
-        <!--<br>-->
     </div>
 
     <div class="panel-footer buttons">
-        <!--Fuck-->
         <!--<button class="btn btn-default">-->
         <!--<span class="glyphicon glyphicon-ban-circle"></span>-->
         <!--</button>-->
@@ -83,10 +80,10 @@
 <table class="table table-striped table-bordered table-condensed table-hover fixed-table">
     <thead>
     <th>EN</th>
-    <th>ES</th>
+    <th>ES<span class="badge pull-right">{{ getAllCards().length }}</span></th>
     </thead>
     <tbody>
-    <tr ng-repeat="card in getAllCards() | filter:search track by card.id"
+    <tr ng-repeat="card in getAllCards() | filter:search track by card.id | orderBy:card.back""
         ng-class="{ success: isRecentlyAdded(card), info: isEditing(card) }"
         class="table-with-button"
         ng-click="editCard(card)">
@@ -124,11 +121,11 @@
                         <li>hacer | to do</li>
                     </ul>
                 </div>
-                <textarea ng-model="zap" class="form-control" rows="10" placeholder="Paste cards here..."></textarea>
+                <textarea ng-model="pastedCards" class="form-control" rows="10" placeholder="Paste cards here..."></textarea>
             </div>
             <div class="modal-footer">
                 <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
-                <button ng-click="importCards(zap)" type="button" class="btn btn-primary" data-dismiss="modal">
+                <button ng-click="importCards(pastedCards)" type="button" class="btn btn-primary" data-dismiss="modal">
                     <span class="glyphicon glyphicon-import"></span>
                 </button>
             </div>
