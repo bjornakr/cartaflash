@@ -176,7 +176,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 for (i = 0; i < learnedCards.length
                     && cardsForPractice.length < currentPracticeCardDeckSize; i++) {
                     if (cardsForPractice.indexOf(learnedCards[i]) < 0) {
-                        learnedCards[i] = "Already learned, but needed to fill the deck."
+                        learnedCards[i] = "Already learned, but needed to fill the deck.";
                         cardsForPractice.push(learnedCards[i]);
                         console.log("Adding additional already learned card " + learnedCards[i].id)
                     }
@@ -208,7 +208,7 @@ services.factory('PracticeSessionService', ['CardRepository',
 
         function calculateDayDiff(time1, time2) {
             var oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-            return (time1 - time2) / oneDay;
+            return Math.round(Math.abs((time1.getTime() - time2.getTime()) / oneDay));
         }
 
 
@@ -226,7 +226,7 @@ services.factory('PracticeSessionService', ['CardRepository',
         function isEligibleForReview(card) {
             var additionalWinstreak = card.winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
             var waitDays = Math.pow(2, additionalWinstreak);
-            var daysSinceLastVisit = calculateDayDiff(card.lastVisitedTime, Date.now());
+            var daysSinceLastVisit = calculateDayDiff(new Date(card.lastVisitedTime), new Date());
             return (waitDays - daysSinceLastVisit <= 0);
         }
 
