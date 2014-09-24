@@ -333,23 +333,26 @@ services.factory("CardRepository", [
     function () {
         var db = new localStorageDB("cartaflash", localStorage);
 
-        if (!true) {
+        if (false) {
             db.dropTable("cards");
             db.dropTable("session");
+        }
+        if (!db.tableExists("cards")) {
             db.createTable("cards",
                 ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
                     "winstreak", "lastVisitedTime", "lastUpdated"]);
-
+        }
+        if (!db.tableExists("session")) {
             db.createTable("session",
                 ["remainingCards", "currentCardIndex", "originalDeck"]);
-
+        }
 //            db.insert("cards", { id: "SER|TO BE", front: "Ser", back: "To be"});
 //            db.insert("cards", { id: "HACER|TO DO", front: "Hacer", back: "To do"});
 //            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
 //            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
 //            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
-            db.commit();
-        }
+        db.commit();
+        
 
         function firstOrNull(result) {
             if (result.length > 0) {
