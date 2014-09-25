@@ -139,7 +139,6 @@ controllers.controller("ImportExportController", ["$scope",
     function ($scope) {
         $scope.click = function () {
             window.prompt("Copy to clipboard: Ctrl+C, Enter", "Ayayayayaya!");
-            console.log("POW!");
         }
     }
 ]);
