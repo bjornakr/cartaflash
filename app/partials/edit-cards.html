@@ -83,7 +83,7 @@
     <th>ES<span class="badge pull-right">{{ getAllCards().length }}</span></th>
     </thead>
     <tbody>
-    <tr ng-repeat="card in getAllCards() | filter:search track by card.id | orderBy:card.back""
+    <tr ng-repeat="card in getAllCards() | filter:search track by card.id"
         ng-class="{ success: isRecentlyAdded(card), info: isEditing(card) }"
         class="table-with-button"
         ng-click="editCard(card)">

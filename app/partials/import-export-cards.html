@@ -1,10 +1,15 @@
-<div class="center">
-    <!--<ul class="nav nav-pills nav-stacked">-->
-    <!--<li class="active"><a href="#">Import new cards</a></li>-->
-    <!--<li><a href="#">Save state</a></li>-->
-    <!--<li><a href="#">Load state</a></li>-->
-    <!--</ul>-->
+<div ng-if="importResult !== null && importResult.status === 'SUCCESS'"
+     class="alert alert-success">
+    {{ importResult.message }}
+</div>
+<div ng-if="importResult !== null && importResult.status === 'FAIL'"
+     class="alert alert-danger">
+    <strong>{{ importResult.message }}</strong>
+    {{ importResult.details }}
+</div>
 
+
+<div class="center">
     <button class="btn btn-success" data-toggle="modal" data-target="#exportStateModal">
         <span class="glyphicon glyphicon-floppy-save"></span> Export state
     </button>

@@ -97,8 +97,9 @@ services.factory('PracticeSessionService', ['CardRepository',
         var REQUIRED_WINSTREAK_FOR_LEARN = 3;
 
         var remainingCards = null;
-        var originalDeck = null;
+//        var originalDeck = null;
         var currentCardIndex = 0;
+        var completedCards = [];
 
 //        function saveSession() {
 //            cardRepository.saveSession(remainingCards, currentCardIndex, originalDeck);
@@ -180,7 +181,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 for (i = 0; i < learnedCards.length
                     && cardsForPractice.length < currentPracticeCardDeckSize; i++) {
                     if (cardsForPractice.indexOf(learnedCards[i]) < 0) {
-                        learnedCards[i] = "Already learned, but needed to fill the deck.";
+                        learnedCards[i].origin = "Already learned, but needed to fill the deck.";
                         cardsForPractice.push(learnedCards[i]);
                         console.log("Adding additional already learned card " + learnedCards[i].id)
                     }
@@ -240,7 +241,8 @@ services.factory('PracticeSessionService', ['CardRepository',
                 var sessionState = cardRepository.loadSession();
                 if (sessionState !== null) {
                     remainingCards = sessionState.remainingCards;
-                    originalDeck = sessionState.originalDeck;
+                    completedCards = sessionState.completedCards;
+//                    originalDeck = sessionState.originalDeck;
                     currentCardIndex = sessionState.currentCardIndex;
                 }
             },
@@ -250,7 +252,7 @@ services.factory('PracticeSessionService', ['CardRepository',
             },
 
             nextCard: function () {
-                cardRepository.saveSession(remainingCards, currentCardIndex, originalDeck);
+                cardRepository.saveSession(remainingCards, currentCardIndex, completedCards);
                 currentCardIndex++;
 
                 if (currentCardIndex >= remainingCards.length) {
@@ -277,6 +279,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 card.lastVisitedTime = Date.now();
                 cardRepository.update(card);
                 remainingCards.splice(currentCardIndex, 1);
+                completedCards.push(card);
                 currentCardIndex -= 1;
             },
 
@@ -290,7 +293,7 @@ services.factory('PracticeSessionService', ['CardRepository',
 
             startSession: function () {
                 remainingCards = createPracticeCardDeck();
-                originalDeck = angular.copy(remainingCards);
+//                originalDeck = angular.copy(remainingCards);
                 currentCardIndex = -1;
             },
 
@@ -302,22 +305,33 @@ services.factory('PracticeSessionService', ['CardRepository',
                 return remainingCards !== null && remainingCards.length === 0;
             },
 
-            getOriginalDeck: function () {
-                return originalDeck;
-            },
+//            getOriginalDeck: function () {
+//                return originalDeck;
+//            },
 
             currentProgress: function () {
-                return (1 - ((remainingCards.length - 1) / originalDeck.length)) * 100;
+                console.log(completedCards);
+                console.log(remainingCards);
+                var totalNoOfCards = completedCards.length + remainingCards.length;
+                console.log(totalNoOfCards);
+                return (1 - ((remainingCards.length - 1) / totalNoOfCards)) * 100;
             },
 
             resetSession: function () {
                 cardRepository.deleteSession();
                 remainingCards = null;
-                originalDeck = null;
+//                originalDeck = null;
+                completedCards = [];
                 currentCardIndex = 0;
+            },
+
+            hasRequiredWinstreak: function(card) {
+                return card.winstreak >= REQUIRED_WINSTREAK_FOR_LEARN;
+            },
+
+            getCompletedCards: function () {
+                return completedCards;
             }
-
-
         };
     }
 ])
@@ -327,7 +341,7 @@ services.factory('PracticeSessionService', ['CardRepository',
 services.factory("ImportExportService", ["CardRepository",
     function (cardRepository) {
         return {
-            loadState: function(pastedState) {
+            loadState: function (pastedState) {
                 var stateAsJson = JSON.parse(pastedState);
                 cardRepository.resetTo(stateAsJson);
             }
@@ -341,7 +355,7 @@ services.factory("CardRepository", [
         //var db = new localStorageDB("cartaflash", localStorage);
         var db = new localStorageDB("cf_test", localStorage);
 
-        if (!true) {
+        if (true) {
             if (db.tableExists("cards")) {
                 db.dropTable("cards");
             }
@@ -353,29 +367,14 @@ services.factory("CardRepository", [
                     "winstreak", "lastVisitedTime", "lastUpdated"]);
 
             db.createTable("session",
-                ["remainingCards", "currentCardIndex", "originalDeck"]);
+                ["remainingCards", "currentCardIndex", "completedCards"]);
 
-//            db.insert("cards", { id: "SER|TO BE", front: "Ser", back: "To be"});
-//            db.insert("cards", { id: "HACER|TO DO", front: "Hacer", back: "To do"});
-//            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
-//            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
-//            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
+            db.insert("cards", { id: "SER|TO BE", front: "Ser", back: "To be"});
+            db.insert("cards", { id: "HACER|TO DO", front: "Hacer", back: "To do"});
+            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
+            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
+            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
             db.commit();
-        }
-
-        function dropAndCreateTables() {
-            if (db.tableExists("cards")) {
-                db.dropTable("cards");
-            }
-            if (db.tableExists("session")) {
-                db.dropTable("session");
-            }
-            db.createTable("cards",
-                ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
-                    "winstreak", "lastVisitedTime", "lastUpdated"]);
-
-            db.createTable("session",
-                ["remainingCards", "currentCardIndex", "originalDeck"]);
         }
 
         function firstOrNull(result) {
@@ -446,12 +445,12 @@ services.factory("CardRepository", [
                 return result.length > 0;
             },
 
-            saveSession: function (remainingCards, currentCardIndex, originalDeck) {
+            saveSession: function (remainingCards, currentCardIndex, completedCards) {
                 this.deleteSession();
                 db.insert("session", {
                     remainingCards: remainingCards,
                     currentCardIndex: currentCardIndex,
-                    originalDeck: originalDeck
+                    completedCards: completedCards
                 });
                 db.commit();
             },
@@ -479,7 +478,7 @@ services.factory("CardRepository", [
                 db.truncate("cards");
                 db.truncate("session");
                 db.commit();
-                
+
                 var serializedCards = serializedDb.data.cards;
                 console.log(serializedCards);
                 for (var cardKey in serializedCards) {

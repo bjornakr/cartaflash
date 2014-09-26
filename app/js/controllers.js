@@ -81,9 +81,6 @@ controllers.controller('PracticeSessionController',
                     currentCard = practiceSessionService.nextCard();
                 }
                 else {
-                    console.log("Ru!");
-//                    currentCard = null;
-//                if (!practiceSessionService.isSessionFinished()) {
                     practiceSessionService.endSession();
                 }
             };
@@ -126,14 +123,22 @@ controllers.controller('PracticeSessionController',
                 $scope.nextCard();
             };
 
-            $scope.getOriginalDeck = function () {
-                return practiceSessionService.getOriginalDeck();
+            $scope.getCompletedCards = function () {
+                return practiceSessionService.getCompletedCards();
             }
 
-            $scope.restart = function() {
+            $scope.restart = function () {
                 practiceSessionService.resetSession()
             }
 
+            $scope.practiceIsCompleted = function (card) {
+                return practiceSessionService.hasRequiredWinstreak(card);
+            }
+
+            $scope.isTroublesome = function (card) {
+                console.log(card.timesAnsweredCorrectly / card.timesAnswered);
+                return card.timesAnsweredCorrectly / card.timesAnswered < 0.2;
+            }
         }
     ]);
 
@@ -144,8 +149,23 @@ controllers.controller("ImportExportController", ["$scope", "ImportExportService
             return cardRepository.exportAsJson();
         };
 
+        $scope.importResult = null;
+
         $scope.importState = function (pastedState) {
-            importExportService.loadState(pastedState);
+            try {
+                importExportService.loadState(pastedState);
+                $scope.importResult = {
+                    message: "Import successful!",
+                    status: "SUCCESS"
+                };
+            }
+            catch (exception) {
+                $scope.importResult = {
+                    message: "Import failed!",
+                    details: exception.message,
+                    status: "FAIL"
+                };
+            }
         };
     }
 ]);
@@ -166,7 +186,6 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         var importedCards = [];
 
         (function () {
-            console.log("SLAP!");
             cardService.refresh();
         }());
 
