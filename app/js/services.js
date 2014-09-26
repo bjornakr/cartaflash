@@ -377,6 +377,7 @@ services.factory("CardRepository", [
 //            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
 //            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
 //            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
+
 //            db.commit();
         }
 
