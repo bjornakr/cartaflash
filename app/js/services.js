@@ -81,6 +81,10 @@ services.factory('CardService', ['CardRepository',
 
                 exists: function (card) {
                     return cardRepository.exists(generateId(card), card.ID);
+                },
+
+                refresh: function () {
+                    cards = cardRepository.getAll();
                 }
             }
         }]
@@ -235,7 +239,6 @@ services.factory('PracticeSessionService', ['CardRepository',
             loadSession: function () {
                 var sessionState = cardRepository.loadSession();
                 if (sessionState !== null) {
-                    console.log("LOAD!");
                     remainingCards = sessionState.remainingCards;
                     originalDeck = sessionState.originalDeck;
                     currentCardIndex = sessionState.currentCardIndex;
@@ -257,7 +260,6 @@ services.factory('PracticeSessionService', ['CardRepository',
                 var nextCard = cardRepository.getById(remainingCards[currentCardIndex].id);
                 if (nextCard != null) { // Card was deleted during practice session
                     nextCard.origin = remainingCards[currentCardIndex].origin;
-                    console.log(new Date(nextCard.lastVisitedTime).toISOString());
                     return nextCard;
                 }
                 else {
@@ -322,20 +324,30 @@ services.factory('PracticeSessionService', ['CardRepository',
 ;
 
 
-services.factory("ImportExportService", [
-    function () {
-
+services.factory("ImportExportService", ["CardRepository",
+    function (cardRepository) {
+        return {
+            loadState: function(pastedState) {
+                var stateAsJson = JSON.parse(pastedState);
+                cardRepository.resetTo(stateAsJson);
+            }
+        }
     }
 ]);
 
 
 services.factory("CardRepository", [
     function () {
-        var db = new localStorageDB("cartaflash", localStorage);
+        //var db = new localStorageDB("cartaflash", localStorage);
+        var db = new localStorageDB("cf_test", localStorage);
 
         if (!true) {
-            db.dropTable("cards");
-            db.dropTable("session");
+            if (db.tableExists("cards")) {
+                db.dropTable("cards");
+            }
+            if (db.tableExists("session")) {
+                db.dropTable("session");
+            }
             db.createTable("cards",
                 ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
                     "winstreak", "lastVisitedTime", "lastUpdated"]);
@@ -349,6 +361,21 @@ services.factory("CardRepository", [
 //            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
 //            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
             db.commit();
+        }
+
+        function dropAndCreateTables() {
+            if (db.tableExists("cards")) {
+                db.dropTable("cards");
+            }
+            if (db.tableExists("session")) {
+                db.dropTable("session");
+            }
+            db.createTable("cards",
+                ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
+                    "winstreak", "lastVisitedTime", "lastUpdated"]);
+
+            db.createTable("session",
+                ["remainingCards", "currentCardIndex", "originalDeck"]);
         }
 
         function firstOrNull(result) {
@@ -432,7 +459,6 @@ services.factory("CardRepository", [
             loadSession: function () {
                 var session = db.query("session");
                 if (session.length > 0) {
-                    console.log(session);
                     return session[0];
                 }
                 else {
@@ -441,7 +467,25 @@ services.factory("CardRepository", [
             },
 
             deleteSession: function () {
-                db.deleteRows("session");
+                db.truncate("session");
+                db.commit();
+            },
+
+            exportAsJson: function () {
+                return db.serialize();
+            },
+
+            resetTo: function (serializedDb) {
+                db.truncate("cards");
+                db.truncate("session");
+                db.commit();
+                
+                var serializedCards = serializedDb.data.cards;
+                console.log(serializedCards);
+                for (var cardKey in serializedCards) {
+                    db.insert("cards", serializedCards[cardKey]);
+                }
+                db.commit();
             }
         }
     }

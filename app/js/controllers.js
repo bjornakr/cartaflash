@@ -81,6 +81,9 @@ controllers.controller('PracticeSessionController',
                     currentCard = practiceSessionService.nextCard();
                 }
                 else {
+                    console.log("Ru!");
+//                    currentCard = null;
+//                if (!practiceSessionService.isSessionFinished()) {
                     practiceSessionService.endSession();
                 }
             };
@@ -135,11 +138,15 @@ controllers.controller('PracticeSessionController',
     ]);
 
 
-controllers.controller("ImportExportController", ["$scope",
-    function ($scope) {
-        $scope.click = function () {
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", "Ayayayayaya!");
-        }
+controllers.controller("ImportExportController", ["$scope", "ImportExportService", "CardRepository",
+    function ($scope, importExportService, cardRepository) {
+        $scope.exportState = function () {
+            return cardRepository.exportAsJson();
+        };
+
+        $scope.importState = function (pastedState) {
+            importExportService.loadState(pastedState);
+        };
     }
 ]);
 
@@ -157,6 +164,11 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         var cardForEdit = null;
         var cardBeforeEdit = null;
         var importedCards = [];
+
+        (function () {
+            console.log("SLAP!");
+            cardService.refresh();
+        }());
 
         function hasInput(text) {
             return typeof text !== "undefined"
