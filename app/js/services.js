@@ -310,10 +310,7 @@ services.factory('PracticeSessionService', ['CardRepository',
 //            },
 
             currentProgress: function () {
-                console.log(completedCards);
-                console.log(remainingCards);
                 var totalNoOfCards = completedCards.length + remainingCards.length;
-                console.log(totalNoOfCards);
                 return (1 - ((remainingCards.length - 1) / totalNoOfCards)) * 100;
             },
 
@@ -352,29 +349,29 @@ services.factory("ImportExportService", ["CardRepository",
 
 services.factory("CardRepository", [
     function () {
-        //var db = new localStorageDB("cartaflash", localStorage);
-        var db = new localStorageDB("cf_test", localStorage);
+        var db = new localStorageDB("cartaflash", localStorage);
+//        var db = new localStorageDB("cf_test", localStorage);
 
-        if (true) {
-            if (db.tableExists("cards")) {
-                db.dropTable("cards");
-            }
+        if (!true) {
+//            if (db.tableExists("cards")) {
+//                db.dropTable("cards");
+//            }
             if (db.tableExists("session")) {
                 db.dropTable("session");
             }
-            db.createTable("cards",
-                ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
-                    "winstreak", "lastVisitedTime", "lastUpdated"]);
-
+//            db.createTable("cards",
+//                ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
+//                    "winstreak", "lastVisitedTime", "lastUpdated"]);
+//
             db.createTable("session",
                 ["remainingCards", "currentCardIndex", "completedCards"]);
-
-            db.insert("cards", { id: "SER|TO BE", front: "Ser", back: "To be"});
-            db.insert("cards", { id: "HACER|TO DO", front: "Hacer", back: "To do"});
-            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
-            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
-            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
-            db.commit();
+//
+//            db.insert("cards", { id: "SER|TO BE", front: "Ser", back: "To be"});
+//            db.insert("cards", { id: "HACER|TO DO", front: "Hacer", back: "To do"});
+//            db.insert("cards", { id: "DESVANECER|TO FADE", front: "Desvanecer", back: "To fade"});
+//            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
+//            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
+//            db.commit();
         }
 
         function firstOrNull(result) {

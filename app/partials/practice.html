@@ -72,8 +72,12 @@
             <td>{{ card.front }}</td>
             <td>{{ card.back }}</td>
             <td>
-                <span ng-if="practiceIsCompleted(card)" class="glyphicon glyphicon-star"></span>
-                <span ng-if="isTroublesome(card)" class="glyphicon glyphicon-warning-sign"></span>
+                <span ng-if="practiceIsCompleted(card)" class="glyphicon glyphicon-star"
+                      data-toggle="tooltip" data-placement="left"
+                      title="You have finished practicing this card for now."></span>
+                <span ng-if="isTroublesome(card)" class="glyphicon glyphicon-warning-sign"
+                      data-toggle="tooltip" data-placement="left"
+                      title="You are having trouble with this card."></span>
             </td>
         </tr>
     </table>

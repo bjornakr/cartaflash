@@ -137,7 +137,7 @@ controllers.controller('PracticeSessionController',
 
             $scope.isTroublesome = function (card) {
                 console.log(card.timesAnsweredCorrectly / card.timesAnswered);
-                return card.timesAnsweredCorrectly / card.timesAnswered < 0.2;
+                return card.timesAnsweredCorrectly / card.timesAnswered < 0.4;
             }
         }
     ]);
