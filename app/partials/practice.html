@@ -1,6 +1,7 @@
 <!--MAIN CARD SCREEN-->
 <div ng-if="isSessionStarted() && !isSessionFinished()">
 
+
     <!--CARD-->
     <!--<button class="btn btn-danger pull-right"><span class="glyphicon glyphicon-remove"></span></button>-->
     <div class="card blue-box" ng-click="revealAnswer()">
@@ -30,6 +31,7 @@
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
 
+
             <span class="glyphicon glyphicon-chevron-right chevron"></span>
         </div>
         <div ng-if="!answerIsRevealed()">
@@ -40,7 +42,6 @@
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
         </div>
-
     </div>
 
     <!--PROGRESS BAR-->
@@ -50,6 +51,21 @@
              style="width: {{ currentProgress() }}%;">
         </div>
     </div>
+
+    <div class="alert alert-info">
+        <ul>
+            <!--<li>{{ getCurrentCard().front }} | {{ getCurrentCard().back }}</li>-->
+            <li><strong>Origin: {{ getCurrentCard().origin }}</strong></li>
+            <li><strong>Winstreak: {{ getCurrentCard().winstreak }}</strong></li>
+            <li>Times answered: {{ getCurrentCard().timesAnswered }}</li>
+            <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }}</li>
+            <!--<li>Last visited: {{ getCurrentCard().lastVisitedTime }}</li>-->
+        </ul>
+
+    </div>
+    <button class="btn btn-default pull-right" ng-click="terminateSession()">
+        <span class="glyphicon glyphicon-stop"></span> End session
+    </button>
 
 </div>
 
@@ -89,14 +105,3 @@
 
 </div>
 
-<div ng-if="isSessionStarted() && !isSessionFinished()" class="alert alert-info">
-    <ul>
-        <!--<li>{{ getCurrentCard().front }} | {{ getCurrentCard().back }}</li>-->
-        <li><strong>Origin: {{ getCurrentCard().origin }}</strong></li>
-        <li><strong>Winstreak: {{ getCurrentCard().winstreak }}</strong></li>
-        <li>Times answered: {{ getCurrentCard().timesAnswered }}</li>
-        <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }}</li>
-        <li>Last visited: {{ getCurrentCard().lastVisitedTime }}</li>
-    </ul>
-
-</div>

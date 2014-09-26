@@ -125,19 +125,22 @@ controllers.controller('PracticeSessionController',
 
             $scope.getCompletedCards = function () {
                 return practiceSessionService.getCompletedCards();
-            }
+            };
 
             $scope.restart = function () {
                 practiceSessionService.resetSession()
-            }
+            };
 
             $scope.practiceIsCompleted = function (card) {
                 return practiceSessionService.hasRequiredWinstreak(card);
-            }
+            };
 
             $scope.isTroublesome = function (card) {
-                console.log(card.timesAnsweredCorrectly / card.timesAnswered);
                 return card.timesAnsweredCorrectly / card.timesAnswered < 0.4;
+            };
+
+            $scope.terminateSession = function () {
+                practiceSessionService.terminateSession();
             }
         }
     ]);

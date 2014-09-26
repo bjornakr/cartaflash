@@ -17,7 +17,6 @@ services.factory('KeyPressService', [
                     return _keyCode;
                 },
                 setKeypress: function (keyCode) {
-//                    console.log(keyCode);
                     _keyCode = keyCode;
                 },
                 hasRightArrow: function () {
@@ -232,6 +231,8 @@ services.factory('PracticeSessionService', ['CardRepository',
             var additionalWinstreak = card.winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
             var waitDays = Math.pow(2, additionalWinstreak);
             var daysSinceLastVisit = calculateDayDiff(new Date(card.lastVisitedTime), new Date());
+            console.log()
+            console.log("DSLV: " + daysSinceLastVisit, ", WD: " + waitDays);
             return (waitDays - daysSinceLastVisit <= 0);
         }
 
@@ -305,6 +306,10 @@ services.factory('PracticeSessionService', ['CardRepository',
                 return remainingCards !== null && remainingCards.length === 0;
             },
 
+            terminateSession: function () {
+                remainingCards = [];
+            },
+
 //            getOriginalDeck: function () {
 //                return originalDeck;
 //            },
@@ -322,7 +327,7 @@ services.factory('PracticeSessionService', ['CardRepository',
                 currentCardIndex = 0;
             },
 
-            hasRequiredWinstreak: function(card) {
+            hasRequiredWinstreak: function (card) {
                 return card.winstreak >= REQUIRED_WINSTREAK_FOR_LEARN;
             },
 
@@ -351,6 +356,7 @@ services.factory("CardRepository", [
     function () {
         var db = new localStorageDB("cartaflash", localStorage);
 //        var db = new localStorageDB("cf_test", localStorage);
+        createNonexistingTables();
 
         if (!true) {
 //            if (db.tableExists("cards")) {
@@ -372,6 +378,21 @@ services.factory("CardRepository", [
 //            db.insert("cards", { id: "NALGEAR|TO SPANK", front: "Nalgear", back: "To spank"});
 //            db.insert("cards", { id: "CHIFLADO|MADMAN", front: "Chiflado", back: "Madman"});
 //            db.commit();
+        }
+
+        function createNonexistingTables() {
+            if (!db.tableExists("cards")) {
+                db.createTable("cards",
+                    ["id", "front", "back", "timesAnswered", "timesAnsweredCorrectly",
+                        "winstreak", "lastVisitedTime", "lastUpdated"]);
+                db.commit();
+            }
+
+            if (!db.tableExists("session")) {
+                db.createTable("session",
+                    ["remainingCards", "currentCardIndex", "completedCards"]);
+                db.commit();
+            }
         }
 
         function firstOrNull(result) {
@@ -421,7 +442,6 @@ services.factory("CardRepository", [
                     return modifiedCard;
                 });
                 db.commit();
-//                console.log(db.serialize());
             },
 
             delete: function (id) {
@@ -477,7 +497,6 @@ services.factory("CardRepository", [
                 db.commit();
 
                 var serializedCards = serializedDb.data.cards;
-                console.log(serializedCards);
                 for (var cardKey in serializedCards) {
                     db.insert("cards", serializedCards[cardKey]);
                 }
