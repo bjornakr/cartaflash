@@ -123,23 +123,50 @@ controllers.controller('PracticeSessionController',
                 $scope.nextCard();
             };
 
-            $scope.getOriginalDeck = function () {
-                return practiceSessionService.getOriginalDeck();
+            $scope.getCompletedCards = function () {
+                return practiceSessionService.getCompletedCards();
             }
 
-            $scope.restart = function() {
+            $scope.restart = function () {
                 practiceSessionService.resetSession()
             }
 
+            $scope.practiceIsCompleted = function (card) {
+                return practiceSessionService.hasRequiredWinstreak(card);
+            }
+
+            $scope.isTroublesome = function (card) {
+                console.log(card.timesAnsweredCorrectly / card.timesAnswered);
+                return card.timesAnsweredCorrectly / card.timesAnswered < 0.4;
+            }
         }
     ]);
 
 
-controllers.controller("ImportExportController", ["$scope",
-    function ($scope) {
-        $scope.click = function () {
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", "Ayayayayaya!");
-        }
+controllers.controller("ImportExportController", ["$scope", "ImportExportService", "CardRepository",
+    function ($scope, importExportService, cardRepository) {
+        $scope.exportState = function () {
+            return cardRepository.exportAsJson();
+        };
+
+        $scope.importResult = null;
+
+        $scope.importState = function (pastedState) {
+            try {
+                importExportService.loadState(pastedState);
+                $scope.importResult = {
+                    message: "Import successful!",
+                    status: "SUCCESS"
+                };
+            }
+            catch (exception) {
+                $scope.importResult = {
+                    message: "Import failed!",
+                    details: exception.message,
+                    status: "FAIL"
+                };
+            }
+        };
     }
 ]);
 
@@ -157,6 +184,10 @@ controllers.controller('CardCrudController', ['$scope', '$http', 'CardService',
         var cardForEdit = null;
         var cardBeforeEdit = null;
         var importedCards = [];
+
+        (function () {
+            cardService.refresh();
+        }());
 
         function hasInput(text) {
             return typeof text !== "undefined"

@@ -152,3 +152,8 @@ div.alert-warning p.pull-left {
 .smaller-card-text {
     font-size: 26px !important;
 }
+
+.center {
+    width: 60%;
+    margin: 0 auto;
+}
