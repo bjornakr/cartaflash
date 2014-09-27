@@ -157,7 +157,7 @@ div.alert-warning p.pull-left {
     margin: 0 auto;
 }
 
-.input-group-addon {
-    min-width: 300px;
+.input-group-addon-fixed-length {
+    min-width: 80px;
     text-align: left;
 }
