@@ -34,6 +34,7 @@
     <li ng-class="{ active: isActive('/practice')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a></li>
     <li ng-class="{ active: isActive('/edit-cards')}"><a href="#/edit-cards"><span class="glyphicon glyphicon-edit"></span></a></li>
     <li ng-class="{ active: isActive('/import-export-cards')}"><a href="#/import-export-cards"><span class="glyphicon glyphicon-floppy-disk"></span></a></li>
+
     <!--<li ng-class="{ active: isActive('/config')}"><a href="#/config"><span class="glyphicon glyphicon-cog"></span></a></li>-->
     <!--<li ng-class="{ active: isActive('/todo')}"><a href="#/todo"><span class="glyphicon glyphicon-th-list"></span></a></li>-->
 </ul>
@@ -61,34 +62,6 @@
 <script src="js/directives.js"></script>
 
 
-<!-- Place this asynchronous JavaScript just before your </body> tag -->
-<script type="text/javascript">
-    (function() {
-        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-        po.src = 'https://apis.google.com/js/client:plusone.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-    })();
 
-
-    function signinCallback(authResult) {
-        if (authResult['status']['signed_in']) {
-            // Update the app to reflect a signed in user
-            // Hide the sign-in button now that the user is authorized, for example:
-            document.getElementById('signinButton').setAttribute('style', 'display: none');
-        } else {
-            // Update the app to reflect a signed out user
-            // Possible error values:
-            //   "user_signed_out" - User is signed-out
-            //   "access_denied" - User denied access to your app
-            //   "immediate_failed" - Could not automatically log in the user
-            console.log('Sign-in state: ' + authResult['error']);
-        }
-    }
-
-    gapi.client.load('drive', 'v2', function() {
-        console.log('Loaded drive client');
-        readState();
-    });
-</script>
 </body>
 </html>
