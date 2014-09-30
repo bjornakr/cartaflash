@@ -30,23 +30,30 @@
 </head>
 <body ng-controller="KeyEventController" ng-keyup="keypressed($event)">
 <!--<p>Keypress: {{ getKeyCode() }}</p>-->
-<ul class="nav nav-tabs nav-justified" role="tablist" ng-controller="NavBarController">
-    <li ng-class="{ active: isActive('/practice')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a></li>
-    <li ng-class="{ active: isActive('/edit-cards')}"><a href="#/edit-cards"><span class="glyphicon glyphicon-edit"></span></a></li>
-    <li ng-class="{ active: isActive('/import-export-cards')}"><a href="#/import-export-cards"><span class="glyphicon glyphicon-floppy-disk"></span></a></li>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <ul class="nav nav-tabs nav-justified" role="tablist" ng-controller="NavBarController">
+        <li ng-class="{ active: isActive('/practice')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a>
+        </li>
+        <li ng-class="{ active: isActive('/edit-cards')}"><a href="#/edit-cards"><span
+                class="glyphicon glyphicon-edit"></span></a></li>
+        <li ng-class="{ active: isActive('/import-export-cards')}"><a href="#/import-export-cards"><span
+                class="glyphicon glyphicon-floppy-disk"></span></a></li>
 
-    <!--<li ng-class="{ active: isActive('/config')}"><a href="#/config"><span class="glyphicon glyphicon-cog"></span></a></li>-->
-    <!--<li ng-class="{ active: isActive('/todo')}"><a href="#/todo"><span class="glyphicon glyphicon-th-list"></span></a></li>-->
-</ul>
+        <!--<li ng-class="{ active: isActive('/config')}"><a href="#/config"><span class="glyphicon glyphicon-cog"></span></a></li>-->
+        <!--<li ng-class="{ active: isActive('/todo')}"><a href="#/todo"><span class="glyphicon glyphicon-th-list"></span></a></li>-->
+    </ul>
 
-<!--[if lt IE 7]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
+    <!--[if lt IE 7]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+        your browser</a> to improve your experience.</p>
+    <![endif]-->
 
-<div class="main-content">
-    <div ng-view></div>
+    <div class="main-content">
+        <div ng-view></div>
+    </div>
 </div>
+<div class="col-md-4"></div>
 
 <!--<div>Angular seed app: v<span app-version></span></div>-->
 
@@ -60,7 +67,6 @@
 <script src="js/controllers.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
-
 
 
 </body>

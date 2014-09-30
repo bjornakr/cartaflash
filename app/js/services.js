@@ -232,7 +232,7 @@ services.factory('PracticeSessionService', ['CardRepository',
             var waitDays = Math.pow(2, additionalWinstreak);
             var daysSinceLastVisit = calculateDayDiff(new Date(card.lastVisitedTime), new Date());
             console.log()
-            console.log("DSLV: " + daysSinceLastVisit, ", WD: " + waitDays);
+            console.log("Id: " + card.id + ", " + "DSLV: " + daysSinceLastVisit, ", WD: " + waitDays);
             return (waitDays - daysSinceLastVisit <= 0);
         }
 
