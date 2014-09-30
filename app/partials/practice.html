@@ -89,7 +89,9 @@
     <!--</div>-->
 
     <table class="table table-striped table-condensed table-hover">
-        <tr ng-repeat="card in getOriginalDeck() track by card.id">
+        <tr ng-repeat="card in getCompletedCards() track by card.id">
+             <td>{{ card.front }}</td>
+             <td>{{ card.back }}</td>
             <td>
                 <span ng-if="practiceIsCompleted(card)" class="glyphicon glyphicon-star"
                       data-toggle="tooltip" data-placement="left"
