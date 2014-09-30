@@ -158,6 +158,10 @@ div.alert-warning p.pull-left {
 }
 
 .input-group-addon-fixed-length {
-    min-width: 80px;
+    min-width: 75px;
     text-align: left;
+}
+
+.padding-top-5 {
+    padding-top: 5px;
 }
