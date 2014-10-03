@@ -75,6 +75,11 @@ controllers.controller('PracticeSessionController',
                 return currentCard;
             };
 
+            $scope.getFormattedLastVisitedDate = function (card) {
+                var lastVisitedDate = new Date(card.lastVisitedTime);
+                return lastVisitedDate.toLocaleDateString();
+            }
+
             $scope.nextCard = function () {
                 if (!practiceSessionService.isSessionFinished()) {
                     answerIsRevealed = false;
