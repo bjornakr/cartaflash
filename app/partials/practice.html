@@ -82,7 +82,7 @@
             <li><strong>{{ getCurrentCard().origin }}</strong></li>
             <li><strong>Winstreak: {{ getCurrentCard().winstreak }}</strong></li>
             <!-- <li>Times answered: {{ getCurrentCard().timesAnswered }}</li> -->
-            <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }} / {{ getCurrentCard().timesAnswered }}</li>
+            <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }} / {{ getCurrentCard().timesAnswered }} ({{ getCurrentCard().timesAnsweredCorrectly / getCurrentCard().timesAnswered }})</li>
             <li>Last visited: {{ getFormattedLastVisitedDate(getCurrentCard()) }}</li>
         </ul>
 
