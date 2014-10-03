@@ -32,8 +32,10 @@
 <body ng-controller="KeyEventController" ng-keyup="keypressed($event)">
 <!--<p>Keypress: {{ getKeyCode() }}</p>-->
 <!-- <div class="container-fluid">     -->
-<div class="col-md-4"></div>
-<div class="col-md-4">
+<div class="col-md-3 col-lg-4"></div>
+<div class="col-md-6 col-lg-4">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-10">
     <ul class="nav nav-tabs nav-justified" role="tablist" ng-controller="NavBarController">
         <li ng-class="{ active: isActive('/practice')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a>
         </li>
@@ -55,9 +57,11 @@
         <div ng-view></div>
     </div>
 </div>
-<div class="col-md-4"></div>
+    <div class="col-lg-2"></div>
+</div>
+<div class="col-md-3 col-lg-4"></div>
 <!-- </div> -->
-<!--<div>Angular seed app: v<span app-version></span></div>-->
+<!--<div>Angular see8d app: v<span app-version></span></div>-->
 
 <!-- In production use:
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
