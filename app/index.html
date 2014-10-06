@@ -27,11 +27,25 @@
 
     <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
     <script src="js/localstoragedb.js"></script>
+
+
 </head>
 <body ng-controller="KeyEventController" ng-keyup="keypressed($event)">
 <!--<p>Keypress: {{ getKeyCode() }}</p>-->
-<div class="col-md-4"></div>
-<div class="col-md-4">
+<div class="col-sm-4">
+    <span id="signinButton">
+  <span
+          class="g-signin"
+          data-callback="signinCallback"
+          data-clientid="780933248233-08csso799iun8homac3hie2ta83k7bbp.apps.googleusercontent.com"
+          data-cookiepolicy="single_host_origin"
+          data-requestvisibleactions="http://schema.org/AddAction"
+          data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appfolder">
+  </span>
+</span>
+
+</div>
+<div class="col-sm-4">
     <ul class="nav nav-tabs nav-justified" role="tablist" ng-controller="NavBarController">
         <li ng-class="{ active: isActive('/practice')}"><a href="#/card"><span class="glyphicon glyphicon-home"></span></a>
         </li>
@@ -53,7 +67,7 @@
         <div ng-view></div>
     </div>
 </div>
-<div class="col-md-4"></div>
+<div class="col-sm-4"></div>
 
 <!--<div>Angular seed app: v<span app-version></span></div>-->
 
@@ -67,6 +81,75 @@
 <script src="js/controllers.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
+
+
+<!-- Place this asynchronous JavaScript just before your </body> tag -->
+<script type="text/javascript">
+    (function () {
+        var po = document.createElement('script');
+        po.type = 'text/javascript';
+        po.async = true;
+        po.src = 'https://apis.google.com/js/client:plusone.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(po, s);
+    })();
+
+
+    function signinCallback(authResult) {
+        if (authResult['status']['signed_in']) {
+            // Update the app to reflect a signed in user
+            // Hide the sign-in button now that the user is authorized, for example:
+            console.log("Auth!");
+            document.getElementById('signinButton').setAttribute('style', 'display: none');
+
+
+        } else {
+            // Update the app to reflect a signed out user
+            // Possible error values:
+            //   "user_signed_out" - User is signed-out
+            //   "access_denied" - User denied access to your app
+            //   "immediate_failed" - Could not automatically log in the user
+            console.log('Sign-in state: ' + authResult['error']);
+        }
+    }
+
+    function loadDrive() {
+        gapi.client.load('drive', 'v2', function () {
+            console.log('Loaded drive client');
+        });
+    }
+    //
+    //
+    function request() {
+        return gapi.client.request({
+            'path': '/upload/drive/v2/files',
+            'method': 'POST',
+            'params': {'uploadType': 'multipart'},
+            'headers': {
+                'Content-Type': 'application/json'
+            },
+            'body': '{ a = 1 }'
+        });
+    }
+
+    var callback = function (file) {
+        console.log(file)
+    };
+
+    /**
+     * Print metadata for the Application Data folder.
+     */
+    function printApplicationDataFolderMetadata() {
+        var request = gapi.client.drive.files.get({
+            'fileId': 'appfolder'
+        });
+        request.execute(function (resp) {
+            console.log('Id: ' + resp.id);
+            console.log('Title: ' + resp.title);
+        });
+    }
+
+</script>
 
 
 </body>

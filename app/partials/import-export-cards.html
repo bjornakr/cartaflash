@@ -108,84 +108,85 @@
     <!--});-->
 <!--</script>-->
 
+<!--<script src="https://apis.google.com/js/client:platform.js" async defer></script>-->
 
-<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
-<script type="text/javascript">
-    var CLIENT_ID = '780933248233-j5aree1dtb837tc143sqfhv5ias82r3t.apps.googleusercontent.com';
-    var SCOPES = [
-        'https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/plus.login',
-        'https://www.googleapis.com/auth/drive.appdata'
-        // Add other scopes needed by your application.
-    ];
+<!--<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>-->
+<!--<script type="text/javascript">-->
+    <!--var CLIENT_ID = '780933248233-j5aree1dtb837tc143sqfhv5ias82r3t.apps.googleusercontent.com';-->
+    <!--var SCOPES = [-->
+        <!--'https://www.googleapis.com/auth/drive.file',-->
+        <!--'https://www.googleapis.com/auth/userinfo.email',-->
+        <!--'https://www.googleapis.com/auth/userinfo.profile',-->
+        <!--'https://www.googleapis.com/auth/plus.login',-->
+        <!--'https://www.googleapis.com/auth/drive.appdata'-->
+        <!--// Add other scopes needed by your application.-->
+    <!--];-->
 
-    /**
-     * Called when the client library is loaded.
-     */
-    function handleClientLoad() {
-        checkAuth();
-    }
+    <!--/**-->
+     <!--* Called when the client library is loaded.-->
+     <!--*/-->
+    <!--function handleClientLoad() {-->
+        <!--checkAuth();-->
+    <!--}-->
 
-    /**
-     * Check if the current user has authorized the application.
-     */
-    function checkAuth() {
-        gapi.auth.authorize(
-                {'client_id': CLIENT_ID, 'scope': SCOPES.join(' '), 'immediate': true},
-                handleAuthResult);
-    }
+    <!--/**-->
+     <!--* Check if the current user has authorized the application.-->
+     <!--*/-->
+    <!--function checkAuth() {-->
+        <!--gapi.auth.authorize(-->
+                <!--{'client_id': CLIENT_ID, 'scope': SCOPES.join(' '), 'immediate': true},-->
+                <!--handleAuthResult);-->
+    <!--}-->
 
-    /**
-     * Called when authorization server replies.
-     *
-     * @param {Object} authResult Authorization result.
-     */
-    function handleAuthResult(authResult) {
-        if (authResult) {
-            console.log("AUTH!");
-            zap();
-            // Access token has been successfully retrieved, requests can be sent to the API
-        } else {
-            console.log("NO AUTH!");
-            // No access token could be retrieved, force the authorization flow.
-            gapi.auth.authorize(
-                    {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
-                    handleAuthResult);
-        }
-    }
+    <!--/**-->
+     <!--* Called when authorization server replies.-->
+     <!--*-->
+     <!--* @param {Object} authResult Authorization result.-->
+     <!--*/-->
+    <!--function handleAuthResult(authResult) {-->
+        <!--if (authResult) {-->
+            <!--console.log("AUTH!");-->
+            <!--zap();-->
+            <!--// Access token has been successfully retrieved, requests can be sent to the API-->
+        <!--} else {-->
+            <!--console.log("NO AUTH!");-->
+            <!--// No access token could be retrieved, force the authorization flow.-->
+            <!--gapi.auth.authorize(-->
+                    <!--{'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},-->
+                    <!--handleAuthResult);-->
+        <!--}-->
+    <!--}-->
 
-    function pow() {
-        gapi.client.load('drive', 'v2', function() {
-            console.log('Loaded drive client');
-//            readState();
-            var request = gapi.client.drive.files.list({
-                'q': '\'appdata\' in parents'
-            });
-            request.execute(function(resp) {
-                for (i in resp.items) {
-                    console.log(i);
-                }
-                // If we have nothing, use the defaults.
-//                stateToForm();
-            });
-        });
-    }
+    <!--function pow() {-->
+        <!--gapi.client.load('drive', 'v2', function() {-->
+            <!--console.log('Loaded drive client');-->
+<!--//            readState();-->
+            <!--var request = gapi.client.drive.files.list({-->
+                <!--'q': '\'appdata\' in parents'-->
+            <!--});-->
+            <!--request.execute(function(resp) {-->
+                <!--for (i in resp.items) {-->
+                    <!--console.log(i);-->
+                <!--}-->
+                <!--// If we have nothing, use the defaults.-->
+<!--//                stateToForm();-->
+            <!--});-->
+        <!--});-->
+    <!--}-->
 
-    function zap() {
-        var token = gapi.auth.getToken();
-        var up = '/' + 'holler';
-        console.log(gapi.auth);
-        $.ajax("https://www.googleapis.com/upload/drive/v2/files" + up + "?uploadType=multipart", {
-            data: { a: 1 },
-            headers: {Authorization: 'Bearer ' + token.access_token},
-            contentType: false,
-            processData: false,
-            type: 'PUT',
-            success: function(data) {
-                console.log("File written");
-            }
-        });
-    }
-</script>
+    <!--function zap() {-->
+        <!--var token = gapi.auth.getToken();-->
+        <!--var up = '/' + 'holler';-->
+        <!--console.log(gapi.auth);-->
+        <!--$.ajax("https://www.googleapis.com/upload/drive/v2/files" + up + "?uploadType=multipart", {-->
+            <!--data: { a: 1 },-->
+            <!--headers: {Authorization: 'Bearer ' + token.access_token},-->
+            <!--contentType: false,-->
+            <!--processData: false,-->
+            <!--type: 'PUT',-->
+            <!--success: function(data) {-->
+                <!--console.log("File written");-->
+            <!--}-->
+        <!--});-->
+    <!--}-->
+<!--</script>-->
