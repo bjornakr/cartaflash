@@ -84,8 +84,13 @@ body {
     margin-top: 30px;
 }
 
+.hspace20 {
+    margin-right: 20px;
+}
+
+
 .main-content {
-    margin: 50px 10px;
+    margin: 10px 10px;
 }
 
 .chevron {
@@ -158,6 +163,19 @@ div.alert-warning p.pull-left {
 }
 
 .input-group-addon-fixed-length {
-    min-width: 80px;
+    min-width: 75px;
     text-align: left;
+}
+
+.padding-top-5 {
+    padding-top: 5px;
+}
+
+.nav-justified > li {
+    display: table-cell;
+    float: left;
+}
+
+.small-text {
+    font-size: 10px;
 }

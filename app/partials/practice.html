@@ -1,7 +1,6 @@
 <!--MAIN CARD SCREEN-->
 <div ng-if="isSessionStarted() && !isSessionFinished()">
 
-
     <!--CARD-->
     <!--<button class="btn btn-danger pull-right"><span class="glyphicon glyphicon-remove"></span></button>-->
     <div class="card blue-box" ng-click="revealAnswer()">
@@ -24,48 +23,70 @@
         <div ng-if="answerIsRevealed()">
             <span class="glyphicon glyphicon-chevron-left chevron"></span>
 
-            <button class="btn btn-warning btn-lg" ng-click="fail()">
+            <button class="btn btn-warning btn-lg hspace20" ng-click="fail()">
                 <span class="glyphicon glyphicon-thumbs-down"></span>
             </button>
             <button class="btn btn-success btn-lg" ng-click="success()">
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
 
-
             <span class="glyphicon glyphicon-chevron-right chevron"></span>
         </div>
         <div ng-if="!answerIsRevealed()">
-            <button class="btn btn-default btn-lg" disabled>
+            <button class="btn btn-default btn-lg hspace20" disabled>
                 <span class="glyphicon glyphicon-thumbs-down"></span>
             </button>
             <button class="btn btn-default btn-lg" disabled>
                 <span class="glyphicon glyphicon-thumbs-up"></span>
             </button>
         </div>
+
     </div>
 
-    <!--PROGRESS BAR-->
-    <div class="progress vspace30">
-        <div class="progress-bar progress-bar-success" role="progressbar"
-             aria-valuenow="{{ currentProgress() }}" aria-valuemin="0" aria-valuemax="100"
-             style="width: {{ currentProgress() }}%;">
+    <!--PROGRESS BAR-->    
+        <div class="row vspace30">
+        <div class="col-sm-1" style="float: left">
+            <button class="btn btn-default btn-sm" ng-click="terminateSession()">
+                <span class="glyphicon glyphicon-stop"></span>
+            </button>
+        </div>
+        <div class="col-sm-11 padding-top-5">
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" role="progressbar"
+                    aria-valuenow="{{ currentProgress() }}" aria-valuemin="0" aria-valuemax="100"
+                    style="width: {{ currentProgress() }}%;">
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="alert alert-info">
+<!--     <div class="row vspace30">
+        <div class="col-sm-6" style="float: left">
+            <button class="btn btn-default btn-sm" ng-click="terminateSession()">
+                <span class="glyphicon glyphicon-stop"></span>
+            </button>
+        </div>        
+        <div class="col-sm-6 padding-top-5">
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" role="progressbar"
+                    aria-valuenow="{{ currentProgress() }}" aria-valuemin="0" aria-valuemax="100"
+                    style="width: {{ currentProgress() }}%;">
+                </div>
+            </div>
+        </div>
+    </div class="row">
+ -->
+    <div class="alert alert-info small-text">
         <ul>
             <!--<li>{{ getCurrentCard().front }} | {{ getCurrentCard().back }}</li>-->
-            <li><strong>Origin: {{ getCurrentCard().origin }}</strong></li>
+            <li><strong>{{ getCurrentCard().origin }}</strong></li>
             <li><strong>Winstreak: {{ getCurrentCard().winstreak }}</strong></li>
-            <li>Times answered: {{ getCurrentCard().timesAnswered }}</li>
-            <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }}</li>
-            <!--<li>Last visited: {{ getCurrentCard().lastVisitedTime }}</li>-->
+            <!-- <li>Times answered: {{ getCurrentCard().timesAnswered }}</li> -->
+            <li>Times answered correctly: {{ getCurrentCard().timesAnsweredCorrectly }} / {{ getCurrentCard().timesAnswered }} ({{ getCurrentCard().timesAnsweredCorrectly / getCurrentCard().timesAnswered }})</li>
+            <li>Last visited: {{ getFormattedLastVisitedDate(getCurrentCard()) }}</li>
         </ul>
 
     </div>
-    <button class="btn btn-default pull-right" ng-click="terminateSession()">
-        <span class="glyphicon glyphicon-stop"></span> End session
-    </button>
 
 </div>
 
@@ -85,8 +106,8 @@
 
     <table class="table table-striped table-condensed table-hover">
         <tr ng-repeat="card in getCompletedCards() track by card.id">
-            <td>{{ card.front }}</td>
-            <td>{{ card.back }}</td>
+             <td>{{ card.front }}</td>
+             <td>{{ card.back }}</td>
             <td>
                 <span ng-if="practiceIsCompleted(card)" class="glyphicon glyphicon-star"
                       data-toggle="tooltip" data-placement="left"
@@ -104,4 +125,3 @@
 
 
 </div>
-
