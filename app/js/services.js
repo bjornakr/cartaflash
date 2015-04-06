@@ -231,7 +231,6 @@ services.factory('PracticeSessionService', ['CardRepository',
             var additionalWinstreak = card.winstreak - REQUIRED_WINSTREAK_FOR_LEARN;
             var waitDays = Math.pow(2, additionalWinstreak);
             var daysSinceLastVisit = calculateDayDiff(new Date(card.lastVisitedTime), new Date());
-            console.log()
             console.log("Id: " + card.id + ", " + "DSLV: " + daysSinceLastVisit, ", WD: " + waitDays);
             return (waitDays - daysSinceLastVisit <= 0);
         }
@@ -505,5 +504,99 @@ services.factory("CardRepository", [
             }
         }
     }
-])
-;
+]);
+
+
+services.factory("GoogleDriveRepository", [
+    function () {
+        var CARTAFLASH_APPDATA_FILENAME = "cartaflash.json";
+
+        function getFileIdOfAppdata() {
+            var request = gapi.client.drive.files.list({
+                'q': '\'appdata\' in parents'
+            });
+            var fileId = 0;
+            request.execute(function (resp) {
+                for (var i in resp.items) {
+                    console.log("ITEM: " + resp.items[i]);
+                    if (resp.items[i].title === CARTAFLASH_APPDATA_FILENAME) {
+                        console.log("YEAH!" + resp.items[i].id);
+                        fileId = resp.items[i].id;
+                        console.log(resp.items[i].getContent());
+                        return;
+
+                    }
+                }
+            });
+            return fileId;
+//            console.log("fileId: " + fileId);
+        }
+
+        function downloadFile(file, callback) {
+            if (file.downloadUrl) {
+                var accessToken = gapi.auth.getToken().access_token;
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', file.downloadUrl);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                xhr.onload = function () {
+                    callback(xhr.responseText);
+                };
+                xhr.onerror = function () {
+                    callback(null);
+                };
+                xhr.send();
+            } else {
+                callback(null);
+            }
+        }
+
+        return {
+            loadAppData: function () {
+
+                gapi.client.load('drive', 'v2', function () {
+                    var fileId = getFileIdOfAppdata();
+                    console.log("fileId: " + fileId);
+                    var request = gapi.client.drive.files.get({
+                        'fileId': fileId
+                    });
+                    request.execute(function (file) {
+                        console.log(file);
+                        downloadFile(file, function (data) {
+                            console.log(data);
+                            return data;
+                        });
+                    });
+                });
+            },
+
+            saveAppData: function () {
+//                var fileName = CARTAFLASH_APPDATA_FILENAME;
+                var metadata = {
+                    title: CARTAFLASH_APPDATA_FILENAME,
+                    mimeType: 'application/json',
+                    parents: [
+                        {id: 'appdata'}
+                    ]
+                };
+                var content = "{ a = 1 }";
+
+                var data = new FormData();
+                data.append("metadata", new Blob([ JSON.stringify(metadata) ], { type: "application/json" }));
+                data.append("file", new Blob([ content ], { type: "application/json" }));
+
+                var token = gapi.auth.getToken();
+                $.ajax("https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart", {
+                    data: data,
+                    headers: {Authorization: 'Bearer ' + token.access_token},
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function (data) {
+                        console.log("File written");
+                        console.log(data);
+                    }
+                });
+            }
+        }
+    }
+]);

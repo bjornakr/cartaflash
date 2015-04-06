@@ -36,14 +36,14 @@
 <!-- <div class="container-fluid">     -->
 <div class="col-md-3 col-lg-4">
     <span id="signinButton">
-    <span
-            class="g-signin"
-            data-callback="signinCallback"
-            data-clientid="780933248233-08csso799iun8homac3hie2ta83k7bbp.apps.googleusercontent.com"
-            data-cookiepolicy="single_host_origin"
-            data-requestvisibleactions="http://schema.org/AddAction"
-            data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appfolder">
-  </span>
+        <span class="g-signin"
+              data-width="iconOnly"
+              data-callback="signinCallback"
+              data-clientid="780933248233-08csso799iun8homac3hie2ta83k7bbp.apps.googleusercontent.com"
+              data-cookiepolicy="single_host_origin"
+              data-requestvisibleactions="http://schema.org/AddAction"
+              data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/drive.appfolder">
+        </span>
 </span>
 
 
@@ -89,6 +89,8 @@
 
 <!-- Place this asynchronous JavaScript just before your </body> tag -->
 <script type="text/javascript">
+    var CLIENT_ID = "780933248233-08csso799iun8homac3hie2ta83k7bbp.apps.googleusercontent.com";
+
     (function () {
         var po = document.createElement('script');
         po.type = 'text/javascript';
@@ -114,8 +116,10 @@
             //   "access_denied" - User denied access to your app
             //   "immediate_failed" - Could not automatically log in the user
             console.log('Sign-in state: ' + authResult['error']);
+            document.getElementById('signinButton').setAttribute('style', 'display: inline');
         }
     }
+
 
     function loadDrive() {
         gapi.client.load('drive', 'v2', function () {
@@ -140,6 +144,82 @@
         console.log(file)
     };
 
+
+
+
+    function write() {
+        var fileName = "cartaflash-settings.json";
+        var metadata = {
+            title: fileName,
+            mimeType: 'application/json',
+            parents: [{id: 'appdata'}]
+        };
+        var content = "{ a = 1 }";
+
+        var data = new FormData();
+        data.append("metadata", new Blob([ JSON.stringify(metadata) ], { type: "application/json" }));
+        data.append("file", new Blob([ content ], { type: "application/json" }));
+
+        var token = gapi.auth.getToken();
+//        console.log(token);
+        $.ajax("https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart", {
+            data: data,
+            headers: {Authorization: 'Bearer ' + token.access_token},
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data) {
+                console.log("File written");
+                console.log(data);
+            }
+        });
+
+    }
+
+    function read () {
+        var fileName = "cartaflash-settings.json";
+        var request = gapi.client.drive.files.list({
+            'q': '\'appdata\' in parents'
+        });
+        var fileId = 0;
+        request.execute(function(resp) {
+            for (i in resp.items) {
+                console.log(resp.items[i]);
+                if(resp.items[i].title === fileName) {
+                    console.log("YEAH!" + resp.items[i].id);
+                    fileId = resp.items[i].id;
+                    console.log(resp.items[i].getContent());
+                    return;
+                }
+            }
+        });
+        console.log("fileId: " + fileId);
+    }
+
+    function loadz() {
+        var request = gapi.client.drive.files.get({
+           'fileId': "1R07NumkGPK4dhx6ZRvOMueWwWIw6sRD2DR2y5Ogv6GPf"
+        });
+        request.execute(function(file) {
+           console.log(file);
+            downloadFile(file, function(data) {
+               console.log(data);
+            });
+        });
+    }
+
+    function ldRead() {
+        gapi.client.load('drive', 'v2', read);
+    }
+
+    function ldPrint() {
+        gapi.client.load('drive', 'v2', printApplicationDataFolderMetadata);
+    }
+
+    function ldLoadz() {
+        gapi.client.load('drive', 'v2', loadz);
+    }
+
     /**
      * Print metadata for the Application Data folder.
      */
@@ -151,6 +231,32 @@
             console.log('Id: ' + resp.id);
             console.log('Title: ' + resp.title);
         });
+    }
+
+    var fileId = "1R07NumkGPK4dhx6ZRvOMueWwWIw6sRD2DR2y5Ogv6GPf";
+
+    /**
+     * Download a file's content.
+     *
+     * @param {File} file Drive File instance.
+     * @param {Function} callback Function to call when the request is complete.
+     */
+    function downloadFile(file, callback) {
+        if (file.downloadUrl) {
+            var accessToken = gapi.auth.getToken().access_token;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', file.downloadUrl);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+            xhr.onload = function() {
+                callback(xhr.responseText);
+            };
+            xhr.onerror = function() {
+                callback(null);
+            };
+            xhr.send();
+        } else {
+            callback(null);
+        }
     }
 
 </script>

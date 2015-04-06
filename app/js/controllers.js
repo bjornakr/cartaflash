@@ -151,8 +151,8 @@ controllers.controller('PracticeSessionController',
     ]);
 
 
-controllers.controller("ImportExportController", ["$scope", "ImportExportService", "CardRepository",
-    function ($scope, importExportService, cardRepository) {
+controllers.controller("ImportExportController", ["$scope", "ImportExportService", "CardRepository", "GoogleDriveRepository",
+    function ($scope, importExportService, cardRepository, googleDriveRepository) {
         $scope.exportState = function () {
             return cardRepository.exportAsJson();
         };
@@ -175,6 +175,14 @@ controllers.controller("ImportExportController", ["$scope", "ImportExportService
                 };
             }
         };
+
+        $scope.saveAppData = function () {
+            googleDriveRepository.saveAppData();
+        };
+
+        $scope.loadAppData = function () {
+            googleDriveRepository.loadAppData();
+        }
     }
 ]);
 
