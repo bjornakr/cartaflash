@@ -507,29 +507,33 @@ services.factory("CardRepository", [
 ]);
 
 
-services.factory("GoogleDriveRepository", [
-    function () {
+services.factory("GoogleDriveRepository", ["CardRepository", "ImportExportService",
+    function (cardRepository, importExportService) {
         var CARTAFLASH_APPDATA_FILENAME = "cartaflash.json";
 
         function getFileIdOfAppdata() {
-            var request = gapi.client.drive.files.list({
-                'q': '\'appdata\' in parents'
-            });
-            var fileId = 0;
-            request.execute(function (resp) {
-                for (var i in resp.items) {
-                    console.log("ITEM: " + resp.items[i]);
-                    if (resp.items[i].title === CARTAFLASH_APPDATA_FILENAME) {
-                        console.log("YEAH!" + resp.items[i].id);
-                        fileId = resp.items[i].id;
-                        console.log(resp.items[i].getContent());
-                        return;
+            console.log("!!!!!!");
+            return new Promise(function (fulfill, reject) {
+                var request = gapi.client.drive.files.list({
+                    'q': '\'appdata\' in parents'
+                });
+                var fileId = 0;
+                request.execute(function (resp) {
+                    for (var i in resp.items) {
+                        console.log("ITEM: " + resp.items[i]);
+                        if (resp.items[i].title === CARTAFLASH_APPDATA_FILENAME) {
+                            console.log("YEAH!" + resp.items[i].id);
+                            fileId = resp.items[i].id;
+//                            console.log(resp.items[i].getContent());
+                            fulfill(fileId);
 
+                        }
                     }
-                }
+                    if (fileId === 0) {
+                        reject();
+                    }
+                });
             });
-            return fileId;
-//            console.log("fileId: " + fileId);
         }
 
         function downloadFile(file, callback) {
@@ -554,17 +558,18 @@ services.factory("GoogleDriveRepository", [
             loadAppData: function () {
 
                 gapi.client.load('drive', 'v2', function () {
-                    var fileId = getFileIdOfAppdata();
-                    console.log("fileId: " + fileId);
-                    var request = gapi.client.drive.files.get({
-                        'fileId': fileId
-                    });
-                    request.execute(function (file) {
-                        console.log(file);
-                        downloadFile(file, function (data) {
-                            console.log(data);
-                            return data;
+                    getFileIdOfAppdata().then(function(fileId) {
+                        console.log("fileId: " + fileId);
+                        var request = gapi.client.drive.files.get({
+                            'fileId': fileId
                         });
+                        request.execute(function (file) {
+                            console.log(file);
+                            downloadFile(file, function (data) {
+                                importExportService.loadState(data);
+                            });
+                        });
+
                     });
                 });
             },
@@ -578,7 +583,7 @@ services.factory("GoogleDriveRepository", [
                         {id: 'appdata'}
                     ]
                 };
-                var content = "{ a = 1 }";
+                var content = cardRepository.exportAsJson(); //"{ a = 22 }";
 
                 var data = new FormData();
                 data.append("metadata", new Blob([ JSON.stringify(metadata) ], { type: "application/json" }));
